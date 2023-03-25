@@ -89,7 +89,7 @@ public class LoginPage extends AppCompatActivity {
                 startActivity(new Intent(LoginPage.this, HomePage.class));
             }
             else
-                wrongPasswordMessage.setText("Passwords might not match or fields are empty");
+                wrongPasswordMessage.setText("Password is incorrect!");
         });
 
         loginBioType.setOnClickListener((view) -> {

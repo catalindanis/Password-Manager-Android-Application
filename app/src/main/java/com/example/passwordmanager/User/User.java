@@ -11,6 +11,8 @@ import com.example.passwordmanager.Config.ToastMessage;
 import com.example.passwordmanager.Config.LoginType;
 import com.example.passwordmanager.Password.Password;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 public class User {
@@ -19,30 +21,35 @@ public class User {
     private static final String LOGIN_TYPE_TABLE = "login_type";
     private static final String FIRST_TIME_TABLE = "first_time";
     private static final String LOGIN_PASSWORD_TABLE = "login_password";
-    private static final String PREFS_NAME = "MyPrefsFile";
 
+    //setLoginType for BIOMETRICS (no password needed)
     public static boolean setLoginType(Context context,LoginType type){
-        if(type == LoginType.PASSWORD)
+        if(type == LoginType.NULL || type == LoginType.PASSWORD)
             return false;
         try {
             loginType = type;
             Database db = new Database(context);
             SQLiteDatabase database = db.getWritableDatabase();
 
+            //removing the current loginType (just to be sure that the table
+            //has no more than 1 element) and inserting the login type value
+            //in it's database table
+            removeLoginType(context);
             ContentValues cv = new ContentValues();
             cv.put("login_type", loginType.name());
             database.insert(LOGIN_TYPE_TABLE, null, cv);
 
             Log.d("COMMENT","SETTED UP USER LOGIN TYPE TO " + type.name());
-
             return true;
         }catch (Exception exception){
+            //in case of an exception, a toast message is thrown, and action is cancelled
             Toast.makeText(context, ToastMessage.CORRUPTED_FILES, Toast.LENGTH_SHORT).show();
             Log.d("COMMENT","SET USER LOGIN TYPE LEAD TO ERROR!");
             return false;
         }
     }
 
+    //setLoginType for PASSWORD (password needed)
     public static boolean setLoginType(Context context,LoginType type, String password){
         if(type == LoginType.NULL || type == LoginType.BIOMETRICS)
             return false;
@@ -54,18 +61,37 @@ public class User {
             ContentValues login_type_value = new ContentValues();
             login_type_value.put("login_type", loginType.name());
 
+            //removing the current loginType (just to be sure that the table
+            //has no more than 1 element) and inserting the login type value
+            //in it's database table
             removeLoginType(context);
             database.insert(LOGIN_TYPE_TABLE, null, login_type_value);
             Log.d("COMMENT","SETTED UP USER LOGIN TYPE TO " + type.name());
 
-            ContentValues password_value = new ContentValues();
-            password_value.put("password",password);
+            //encrypting password using MD5 (Message Digest) algorithm
+            String encryptedpassword = new String();
+            MessageDigest m = MessageDigest.getInstance("MD5");
+            m.update(password.getBytes());
+            byte[] bytes = m.digest();
+            StringBuilder s = new StringBuilder();
+            for(int i=0; i< bytes.length ;i++)
+            {
+                s.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+            }
+            encryptedpassword = s.toString();
 
+            ContentValues password_value = new ContentValues();
+            password_value.put("password",encryptedpassword);
+
+            //removing the current loginPassword (just to be sure that the table
+            //has no more than 1 element) and inserting the login password encrypted
+            //value in it's database table
             removeLoginPassword(context);
             database.insert(LOGIN_PASSWORD_TABLE,null,password_value);
             Log.d("COMMENT","SETTED UP USER LOGIN PASSWORD");
             return true;
         }catch (Exception exception){
+            //in case of an exception, a toast message is thrown, and action is cancelled
             Toast.makeText(context, ToastMessage.CORRUPTED_FILES, Toast.LENGTH_SHORT).show();
             Log.d("COMMENT","SET USER LOGIN TYPE OR LOGIN PASSWORD LEAD TO ERROR!");
             return false;
@@ -73,6 +99,10 @@ public class User {
     }
 
     public static LoginType getLoginType(Context context){
+        //checks if loginType is null. if it is null, then the value
+        //is taken from the database and the loginType variable is changed and returned
+        //is it isn't null, then we can directly return it, because it was
+        //already readed from the database
         if(loginType == LoginType.NULL) {
             try {
                 Database db = new Database(context);
@@ -90,15 +120,19 @@ public class User {
                 database.close();
 
                 Log.d("COMMENT","CURRENT USER LOGIN TYPE IS " + loginType.name());
+                return loginType;
             } catch (Exception exception) {
+                //in case of an exception, a toast message is thrown, and LoginType.NULL is returned
                 Toast.makeText(context, ToastMessage.CORRUPTED_FILES, Toast.LENGTH_SHORT).show();
                 Log.d("COMMENT","GET USER LOGIN TYPE LEAD TO ERROR!");
             }
         }
-        return loginType;
+        return LoginType.NULL;
     }
 
-    public static void removeLoginType(Context context){
+    public static boolean removeLoginType(Context context){
+        //used before updating the loginType.
+        //drops and recreates the desired table for the loginType
         try {
             Database db = new Database(context);
             SQLiteDatabase database = db.getWritableDatabase();
@@ -109,13 +143,18 @@ public class User {
             statement = "CREATE TABLE " + LOGIN_TYPE_TABLE + "(login_type varchar(255))";
             database.execSQL(statement);
             Log.d("COMMENT","REMOVED USER LOGIN TYPE");
+            return true;
         }catch (Exception exception){
+            //in case of an exception, a toast message is thrown, and action is cancelled
             Toast.makeText(context, ToastMessage.CORRUPTED_FILES, Toast.LENGTH_SHORT).show();
             Log.d("COMMENT","REMOVE USER LOGIN TYPE LEAD TO ERROR!");
         }
+        return false;
     }
 
-    public static void removeLoginPassword(Context context){
+    public static boolean removeLoginPassword(Context context){
+        //used before updating the loginPassword.
+        //drops and recreates the desired table for the loginPassword
         try {
             Database db = new Database(context);
             SQLiteDatabase database = db.getWritableDatabase();
@@ -126,14 +165,33 @@ public class User {
             statement = "CREATE TABLE " + LOGIN_PASSWORD_TABLE + "(password varchar(255))";
             database.execSQL(statement);
             Log.d("COMMENT","REMOVED USER LOGIN PASSWORD");
+            return true;
         }catch (Exception exception){
+            //in case of an exception, a toast message is thrown, and action is cancelled
             Toast.makeText(context, ToastMessage.CORRUPTED_FILES, Toast.LENGTH_SHORT).show();
             Log.d("COMMENT","REMOVE USER LOGIN PASSWORD LEAD TO ERROR!");
         }
+        return false;
     }
 
     public static boolean verifyLoginPassword(Context context,String enteredPassword) {
-        if(getLoginPassword(context).equals(enteredPassword)) {
+        //encrypting entered password
+        String encryptedpassword = new String();
+        try {
+            MessageDigest m = MessageDigest.getInstance("MD5");
+            m.update(enteredPassword.getBytes());
+            byte[] bytes = m.digest();
+            StringBuilder s = new StringBuilder();
+            for (int i = 0; i < bytes.length; i++) {
+                s.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+            }
+            encryptedpassword = s.toString();
+        }catch (NoSuchAlgorithmException noSuchAlgorithmException){
+
+        }
+
+        //verifying the encrypted login password from the database with the one entered by the user
+        if(getLoginPassword(context).equals(encryptedpassword)) {
             Log.d("COMMENT","LOGIN BY PASSWORD SUCCESFULLY");
             return true;
         }
@@ -142,8 +200,8 @@ public class User {
     }
 
     private static String getLoginPassword(Context context) {
-        String password = new String();
         try {
+            String password = new String();
             Database db = new Database(context);
             SQLiteDatabase database = db.getReadableDatabase();
 
@@ -158,16 +216,23 @@ public class User {
             database.close();
 
             Log.d("COMMENT","RETURNED USER LOGIN PASSWORD SUCCESFULLY ");
+            return password;
         }catch (Exception exception){
+            //in case of an exception, a toast message is thrown, and null is returned
             Toast.makeText(context, ToastMessage.CORRUPTED_FILES, Toast.LENGTH_SHORT).show();
             Log.d("COMMENT","GET USER LOGIN PASSWORD LEAD TO ERROR!");
         }
-        return password;
+
+        return null;
     }
 
     public static boolean isFirstTime(Context context){
-        boolean value = true;
         try {
+            //read the value from it's database table
+            //returns true if the user has never setted up a loginType
+            //isFirstTime will return false only aftter setting a login method,
+            //after first HomePage onCreate
+            boolean value = true;
             Database db = new Database(context);
             SQLiteDatabase database = db.getReadableDatabase();
 
@@ -182,14 +247,17 @@ public class User {
             database.close();
 
             Log.d("COMMENT","CURRENT USER FIRST TIME IS " + (value ? "TRUE" : "FALSE"));
+            return value;
         }catch (Exception exception){
+            //in case of an exception, a toast message is thrown, and the value true is returned
             Toast.makeText(context, ToastMessage.CORRUPTED_FILES, Toast.LENGTH_SHORT).show();
             Log.d("COMMENT","GET USER FIRST TIME LEAD TO ERROR!");
         }
-        return value;
+        return true;
     }
 
     public static void setFirstTime(Context context, boolean firstTime){
+        //updates the user isFirstTime variable directly in the database
         try {
             Database db = new Database(context);
             SQLiteDatabase database = db.getWritableDatabase();
