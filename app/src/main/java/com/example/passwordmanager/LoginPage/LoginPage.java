@@ -10,15 +10,20 @@ import androidx.core.content.ContextCompat;
 
 import android.content.Context;
 import android.content.Intent;
+import android.media.Image;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
+import android.transition.Fade;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,6 +42,8 @@ import java.util.concurrent.Executor;
 
 public class LoginPage extends AppCompatActivity {
 
+    ImageView icon;
+    TextView message;
     TextView passwordText;
     EditText password;
     Switch showPassword;
@@ -144,6 +151,8 @@ public class LoginPage extends AppCompatActivity {
     }
 
     private void initializeValues() {
+        icon = (ImageView) findViewById(R.id.imageView2);
+        message = (TextView) findViewById(R.id.textView5);
         wrongPasswordMessage = (TextView) findViewById(R.id.setupWrongPassword1);
         passwordText = (TextView) findViewById(R.id.textView3);
         password = (EditText) findViewById(R.id.setupPassword);
@@ -170,10 +179,17 @@ public class LoginPage extends AppCompatActivity {
         password.setVisibility(View.VISIBLE);
         showPassword.setVisibility(View.VISIBLE);
         continueButton.setVisibility(View.VISIBLE);
+        password.requestFocus();
+        //showing keyboard from phone screen
+        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
     }
 
     private void biometricsLoginPrompt(){
+        message.setY(loginBioType.getY()+200);
+        icon.setY(message.getY());
         loginBioType.setVisibility(View.VISIBLE);
+        loginBioType.callOnClick();
     }
 
     private void hideElements() {
@@ -182,5 +198,20 @@ public class LoginPage extends AppCompatActivity {
         showPassword.setVisibility(View.INVISIBLE);
         continueButton.setVisibility(View.INVISIBLE);
         loginBioType.setVisibility(View.INVISIBLE);
+    }
+
+    boolean doubleBackToExitPressedOnce = false;
+
+    @Override
+    public void onBackPressed() {
+        if (doubleBackToExitPressedOnce) {
+            super.onBackPressed();
+            return;
+        }
+
+        this.doubleBackToExitPressedOnce = true;
+        Toast.makeText(this, ToastMessage.PRESS_DOUBLE_TO_EXIT, Toast.LENGTH_SHORT).show();
+
+        new Handler(Looper.getMainLooper()).postDelayed(() -> doubleBackToExitPressedOnce=false, 2000);
     }
 }

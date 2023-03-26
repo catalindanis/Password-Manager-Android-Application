@@ -101,7 +101,7 @@ public class User {
     public static LoginType getLoginType(Context context){
         //checks if loginType is null. if it is null, then the value
         //is taken from the database and the loginType variable is changed and returned
-        //is it isn't null, then we can directly return it, because it was
+        //if it isn't null, then we can directly return it, because it was
         //already readed from the database
         if(loginType == LoginType.NULL) {
             try {

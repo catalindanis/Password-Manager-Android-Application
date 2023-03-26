@@ -14,7 +14,9 @@ import androidx.biometric.BiometricManager;
 import androidx.biometric.BiometricPrompt;
 import androidx.core.content.ContextCompat;
 
+import com.example.passwordmanager.Config.LoginType;
 import com.example.passwordmanager.Config.RunningActivities;
+import com.example.passwordmanager.Config.ToastMessage;
 import com.example.passwordmanager.HomePage.HomePage;
 import com.example.passwordmanager.R;
 import com.example.passwordmanager.User.User;
@@ -64,7 +66,8 @@ public class SetupLoginPage extends AppCompatActivity {
                     @Override
                     public void onAuthenticationSucceeded(@NonNull @NotNull BiometricPrompt.AuthenticationResult result) {
                         super.onAuthenticationSucceeded(result);
-                        startActivity(new Intent(SetupLoginPage.this, HomePage.class));
+                        if(User.setLoginType(getApplicationContext(), LoginType.BIOMETRICS))
+                            startActivity(new Intent(SetupLoginPage.this, HomePage.class));
                     }
 
                     @Override
@@ -121,7 +124,7 @@ public class SetupLoginPage extends AppCompatActivity {
         }
 
         this.doubleBackToExitPressedOnce = true;
-        Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, ToastMessage.PRESS_DOUBLE_TO_EXIT, Toast.LENGTH_SHORT).show();
 
         new Handler(Looper.getMainLooper()).postDelayed(() -> doubleBackToExitPressedOnce=false, 2000);
     }

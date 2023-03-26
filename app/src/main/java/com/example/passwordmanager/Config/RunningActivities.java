@@ -19,7 +19,7 @@ public class RunningActivities {
                 if(activity.getClass().getSimpleName().equals(exceptActivity.getClass().getSimpleName()))
                     remove = false;
             if(remove)
-                activity.finish();
+                activity.finishAfterTransition();
         }
     }
 }
