@@ -125,9 +125,10 @@ public class User {
                 //in case of an exception, a toast message is thrown, and LoginType.NULL is returned
                 Toast.makeText(context, ToastMessage.CORRUPTED_FILES, Toast.LENGTH_SHORT).show();
                 Log.d("COMMENT","GET USER LOGIN TYPE LEAD TO ERROR!");
+                return LoginType.NULL;
             }
         }
-        return LoginType.NULL;
+        return loginType;
     }
 
     public static boolean removeLoginType(Context context){
@@ -187,19 +188,26 @@ public class User {
             }
             encryptedpassword = s.toString();
         }catch (NoSuchAlgorithmException noSuchAlgorithmException){
-
+            //in case of an exception false is returned
+            Log.d("COMMENT","ENCRYPTING USER ENTERED PASSWORD LEAD TO ERROR!");
+            return false;
         }
 
         //verifying the encrypted login password from the database with the one entered by the user
-        if(getLoginPassword(context).equals(encryptedpassword)) {
-            Log.d("COMMENT","LOGIN BY PASSWORD SUCCESFULLY");
-            return true;
+        try {
+            if (getLoginPassword(context).equals(encryptedpassword)) {
+                Log.d("COMMENT", "LOGIN BY PASSWORD SUCCESFULLY");
+                return true;
+            }
+            Log.d("COMMENT", "PASSWORDS NOT MATCH");
+        }catch (NullPointerException nullPointerException){
+            Log.d("COMMENT","ENCRYPTED PASSWORD FROM THE DATABASE IS NULL!");
         }
-        Log.d("COMMENT","PASSWORDS NOT MATCH");
         return false;
     }
 
     private static String getLoginPassword(Context context) {
+        //read the loginPassword from it's database table, and returns it
         try {
             String password = new String();
             Database db = new Database(context);
@@ -267,6 +275,7 @@ public class User {
             database.insert(FIRST_TIME_TABLE, null, cv);
             Log.d("COMMENT","CHANGED USER FIRST TIME TO " + (firstTime ? "TRUE" : "FALSE"));
         }catch (Exception exception){
+            //in case of an exception, a toast message is thrown, and the action is cancelled
             Toast.makeText(context, ToastMessage.CORRUPTED_FILES, Toast.LENGTH_SHORT).show();
             Log.d("COMMENT","CHANGED USER FIRST TIME LEAD TO ERROR!");
         }

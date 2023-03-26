@@ -161,8 +161,7 @@ public class LoginPage extends AppCompatActivity {
                 biometricsLoginPrompt();
                 break;
             default:
-                Toast.makeText(this, ToastMessage.CORRUPTED_FILES,Toast.LENGTH_SHORT).show();
-                throw new RuntimeException("Login type not found!");
+                startActivity(new Intent(LoginPage.this,SetupLoginPage.class));
         }
     }
 

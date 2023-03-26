@@ -51,10 +51,8 @@ public class LoadingScreen extends AppCompatActivity{
         //check if is the first time user enters the application
         //if it is true, then the user must setup a login method, so checking login type is no longer needed
         if(!User.isFirstTime(this)){
-
             if(User.getLoginType(this) != LoginType.NULL)
                 cls = LoginPage.class;
-
         }
     }
 
