@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="mikado_yellow2">#f8bb00</color>
     <color name="mikado_yellow">#fbbf08</color>
     <color name="lavender">#a47cfb</color>
     <color name="dark_gunmetal">#171830</color>

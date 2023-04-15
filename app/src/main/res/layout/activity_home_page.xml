@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:background="#171830"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".HomePage.HomePage">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/ConstraintLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#171830"
+    tools:context=".HomePage.HomePage">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/MenuLayout"
@@ -21,7 +21,7 @@
 
 
         <Button
-            android:id="@+id/button"
+            android:id="@+id/addButton"
             android:layout_width="match_parent"
             android:layout_height="77dp"
             android:layout_marginTop="24dp"
@@ -45,7 +45,7 @@
             tools:srcCompat="@drawable/add" />
 
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/settingsButton"
             android:layout_width="match_parent"
             android:layout_height="74dp"
             android:layout_marginTop="104dp"
@@ -68,7 +68,7 @@
             tools:srcCompat="@drawable/settings" />
 
         <Button
-            android:id="@+id/button3"
+            android:id="@+id/aboutButton"
             android:layout_width="match_parent"
             android:layout_height="77dp"
             android:layout_marginTop="700dp"
@@ -92,5 +92,17 @@
             tools:srcCompat="@drawable/info" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ScrollView
+        android:id="@+id/ScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/PasswordListLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"></LinearLayout>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

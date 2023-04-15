@@ -6,10 +6,15 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.view.MotionEvent;
+import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.Toast;
 
+import com.example.passwordmanager.Config.OnSwipeTouchListener;
 import com.example.passwordmanager.Config.RunningActivities;
 import com.example.passwordmanager.Config.ToastMessage;
 import com.example.passwordmanager.R;
@@ -17,8 +22,17 @@ import com.example.passwordmanager.User.User;
 
 public class HomePage extends AppCompatActivity {
 
+    ConstraintLayout screen;
     ConstraintLayout menuLayout;
-    ConstraintLayout passwordListLayout;
+    LinearLayout passwordListLayout;
+    ScrollView scrollView;
+    LinearLayout verticalLinearLayout;
+    Button addButton;
+    Button settingsButton;
+    Button aboutButton;
+    ImageView addButtonIcon;
+    ImageView settingsButtonIcon;
+    ImageView aboutButtonIcon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +42,8 @@ public class HomePage extends AppCompatActivity {
         RunningActivities.addActivity(this);
         RunningActivities.finishBackgroundActivitiesExcept(this);
 
+        //change User.isFirstTime variable to false,
+        //because if user entered in home page, then the variable must be false
         if(User.isFirstTime(this))
             User.setFirstTime(this,false);
 
@@ -37,47 +53,53 @@ public class HomePage extends AppCompatActivity {
     }
 
     private void setupListeners() {
+        scrollView.setOnTouchListener(new OnSwipeTouchListener(this){
+            @Override
+            public void onSwipeRight() {
+                menuLayout.setVisibility(View.VISIBLE);
+                //bring layout to front, so that scrollview don't block user from pressing the buttons
+                menuLayout.bringToFront();
+            }
 
+            @Override
+            public void onSwipeLeft() {
+                menuLayout.setVisibility(View.INVISIBLE);
+            }
+        });
+
+
+        //at every button, bring image layout to front, so that button don't come above it
+        addButton.setOnClickListener((view) -> {
+            addButtonIcon.bringToFront();
+            //View element = getLayoutInflater().inflate(R.layout.password, null);
+            //verticalLinearLayout.addView(view);
+        });
+
+        settingsButton.setOnClickListener((view) -> {
+            settingsButtonIcon.bringToFront();
+
+
+        });
+
+        aboutButton.setOnClickListener((view) -> {
+            aboutButtonIcon.bringToFront();
+
+        });
     }
 
     private void initializeValues() {
+        screen = (ConstraintLayout) findViewById(R.id.ConstraintLayout);
         menuLayout = (ConstraintLayout) findViewById(R.id.MenuLayout);
-        //passwordListLayout = (ConstraintLayout) findViewById(R.id.PasswordListLayout);
-
+        passwordListLayout = (LinearLayout) findViewById(R.id.PasswordListLayout);
+        scrollView = (ScrollView) findViewById(R.id.ScrollView);
+        verticalLinearLayout = (LinearLayout) findViewById(R.id.PasswordListLayout);
+        addButton = (Button) findViewById(R.id.addButton);
+        settingsButton = (Button) findViewById(R.id.settingsButton);
+        aboutButton = (Button) findViewById(R.id.aboutButton);
         menuLayout.setVisibility(View.INVISIBLE);
-    }
-
-
-    float x1 = 0,x2 = 0;
-    int MIN_DISTANCE = 100;
-    @Override
-    public boolean onTouchEvent(MotionEvent event)
-    {
-        switch(event.getAction())
-        {
-            case MotionEvent.ACTION_DOWN:
-                x1 = event.getX();
-                break;
-            case MotionEvent.ACTION_UP:
-                x2 = event.getX();
-                float deltaX = x2 - x1;
-                if (Math.abs(deltaX) > MIN_DISTANCE)
-                {
-                    // Left to Right swipe action
-                    if (deltaX > 0)
-                    {
-                        menuLayout.setVisibility(View.VISIBLE);
-                    }
-                    // Right to left swipe action
-                    else
-                    {
-                        menuLayout.setVisibility(View.INVISIBLE);
-                    }
-
-                }
-                break;
-        }
-        return super.onTouchEvent(event);
+        addButtonIcon = (ImageView) findViewById(R.id.imageView6);
+        settingsButtonIcon = (ImageView) findViewById(R.id.imageView8);
+        aboutButtonIcon = (ImageView) findViewById(R.id.imageView7);
     }
 
     boolean doubleBackToExitPressedOnce = false;
