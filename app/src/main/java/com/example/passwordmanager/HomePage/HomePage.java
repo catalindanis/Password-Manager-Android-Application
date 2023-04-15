@@ -3,10 +3,10 @@ package com.example.passwordmanager.HomePage;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -14,10 +14,13 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Toast;
 
+import com.example.passwordmanager.AboutPage.About;
+import com.example.passwordmanager.AddPasswordPage.AddPassword;
 import com.example.passwordmanager.Config.OnSwipeTouchListener;
 import com.example.passwordmanager.Config.RunningActivities;
 import com.example.passwordmanager.Config.ToastMessage;
 import com.example.passwordmanager.R;
+import com.example.passwordmanager.SettingsPage.Settings;
 import com.example.passwordmanager.User.User;
 
 public class HomePage extends AppCompatActivity {
@@ -26,7 +29,7 @@ public class HomePage extends AppCompatActivity {
     ConstraintLayout menuLayout;
     LinearLayout passwordListLayout;
     ScrollView scrollView;
-    LinearLayout verticalLinearLayout;
+    //LinearLayout passwordListLayout;
     Button addButton;
     Button settingsButton;
     Button aboutButton;
@@ -71,19 +74,28 @@ public class HomePage extends AppCompatActivity {
         //at every button, bring image layout to front, so that button don't come above it
         addButton.setOnClickListener((view) -> {
             addButtonIcon.bringToFront();
-            //View element = getLayoutInflater().inflate(R.layout.password, null);
-            //verticalLinearLayout.addView(view);
+//                View element = getLayoutInflater().inflate(R.layout.password, null);
+//                //ViewGroup parent = (ViewGroup) view.getParent();
+//                try {
+//                    //parent.removeView(view);
+//                    passwordListLayout.addView(element);
+//                    Log.d("COMMENT","SUCCES");
+//                }catch (Exception exception){
+//                    Log.d("COMMENT",exception.getMessage());
+//                }
+            startActivity(new Intent(HomePage.this, AddPassword.class));
         });
 
         settingsButton.setOnClickListener((view) -> {
             settingsButtonIcon.bringToFront();
 
-
+            startActivity(new Intent(HomePage.this, Settings.class));
         });
 
         aboutButton.setOnClickListener((view) -> {
             aboutButtonIcon.bringToFront();
 
+            startActivity(new Intent(HomePage.this, About.class));
         });
     }
 
@@ -92,7 +104,6 @@ public class HomePage extends AppCompatActivity {
         menuLayout = (ConstraintLayout) findViewById(R.id.MenuLayout);
         passwordListLayout = (LinearLayout) findViewById(R.id.PasswordListLayout);
         scrollView = (ScrollView) findViewById(R.id.ScrollView);
-        verticalLinearLayout = (LinearLayout) findViewById(R.id.PasswordListLayout);
         addButton = (Button) findViewById(R.id.addButton);
         settingsButton = (Button) findViewById(R.id.settingsButton);
         aboutButton = (Button) findViewById(R.id.aboutButton);

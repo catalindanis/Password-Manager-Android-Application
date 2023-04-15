@@ -16,6 +16,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PasswordManager">
         <activity
+            android:name=".SettingsPage.Settings"
+            android:exported="false" />
+        <activity
+            android:name=".AboutPage.About"
+            android:exported="false" />
+        <activity
+            android:name=".AddPasswordPage.AddPassword"
+            android:exported="false" />
+        <activity
             android:name=".LoginPage.SetupLoginPage"
             android:exported="false" />
         <activity
@@ -32,6 +41,7 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
