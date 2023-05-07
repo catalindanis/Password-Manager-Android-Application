@@ -1,5 +1,7 @@
 package com.example.passwordmanager.Password;
 
+import android.widget.ImageView;
+
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -20,9 +22,31 @@ public class Password {
 
     @ColumnInfo(name = "password")
     private String password;
+    @ColumnInfo(name = "username")
+    private String username;
+    @ColumnInfo(name = "icon")
+    private ImageView icon;
 
-    public Password(String password){
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public ImageView getIcon() {
+        return icon;
+    }
+
+    public void setIcon(ImageView icon) {
+        this.icon = icon;
+    }
+
+    public Password(String username, String password, ImageView icon){
+        this.username = username;
         this.password = password;
+        this.icon = icon;
     }
 
     public String getPassword() {
