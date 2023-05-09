@@ -10,6 +10,7 @@ import android.widget.Toast;
 import com.example.passwordmanager.Config.ToastMessage;
 import com.example.passwordmanager.Config.LoginType;
 import com.example.passwordmanager.Password.Password;
+import com.example.passwordmanager.Password.Passwords_Database;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -21,6 +22,48 @@ public class User {
     private static final String LOGIN_TYPE_TABLE = "login_type";
     private static final String FIRST_TIME_TABLE = "first_time";
     private static final String LOGIN_PASSWORD_TABLE = "login_password";
+    private static final String PASSWORDS_TABLE = "passwords";
+    public static boolean addPassword(Context context, String email, String password, byte[] icon){
+        try{
+            Passwords_Database db = new Passwords_Database(context);
+            SQLiteDatabase database = db.getWritableDatabase();
+
+            ContentValues cv = new ContentValues();
+            cv.put("email", email);
+            cv.put("password", password);
+            cv.put("icon",icon);
+            database.insert(PASSWORDS_TABLE, null, cv);
+
+            Log.d("COMMENT","ADDED PASSWORD SUCCESFULLY!");
+            return true;
+        }
+        catch (Exception exception){
+            Toast.makeText(context, ToastMessage.CANT_ADD_PASSWORD, Toast.LENGTH_SHORT).show();
+            Log.d("COMMENT","ADD PASSWORD LEAD TO ERROR!");
+            return false;
+        }
+    }
+
+    public static boolean removePasswords(Context context){
+        try{
+            User_Database db = new User_Database(context);
+            SQLiteDatabase database = db.getWritableDatabase();
+
+            String statement = "DROP TABLE " + PASSWORDS_TABLE;
+            database.execSQL(statement);
+
+            statement = "CREATE TABLE " + PASSWORDS_TABLE + "(email varchar(255), password varchar(255), icon blob)";
+            database.execSQL(statement);
+
+            Log.d("COMMENT","REMOVED PASSWORDS");
+            return true;
+        }
+        catch (Exception exception){
+            Toast.makeText(context, ToastMessage.CORRUPTED_FILES, Toast.LENGTH_SHORT).show();
+            Log.d("COMMENT","REMOVE PASSWORDS LEAD TO ERROR!");
+            return false;
+        }
+    }
 
     //setLoginType for BIOMETRICS (no password needed)
     public static boolean setLoginType(Context context,LoginType type){
@@ -28,7 +71,7 @@ public class User {
             return false;
         try {
             loginType = type;
-            Database db = new Database(context);
+            User_Database db = new User_Database(context);
             SQLiteDatabase database = db.getWritableDatabase();
 
             //removing the current loginType (just to be sure that the table
@@ -55,7 +98,7 @@ public class User {
             return false;
         try {
             loginType = type;
-            Database db = new Database(context);
+            User_Database db = new User_Database(context);
             SQLiteDatabase database = db.getWritableDatabase();
 
             ContentValues login_type_value = new ContentValues();
@@ -105,7 +148,7 @@ public class User {
         //already readed from the database
         if(loginType == LoginType.NULL) {
             try {
-                Database db = new Database(context);
+                User_Database db = new User_Database(context);
                 SQLiteDatabase database = db.getReadableDatabase();
 
                 String statement = "SELECT login_type FROM " + LOGIN_TYPE_TABLE;
@@ -135,7 +178,7 @@ public class User {
         //used before updating the loginType.
         //drops and recreates the desired table for the loginType
         try {
-            Database db = new Database(context);
+            User_Database db = new User_Database(context);
             SQLiteDatabase database = db.getWritableDatabase();
 
             String statement = "DROP TABLE " + LOGIN_TYPE_TABLE;
@@ -157,7 +200,7 @@ public class User {
         //used before updating the loginPassword.
         //drops and recreates the desired table for the loginPassword
         try {
-            Database db = new Database(context);
+            User_Database db = new User_Database(context);
             SQLiteDatabase database = db.getWritableDatabase();
 
             String statement = "DROP TABLE " + LOGIN_PASSWORD_TABLE;
@@ -210,7 +253,7 @@ public class User {
         //read the loginPassword from it's database table, and returns it
         try {
             String password = new String();
-            Database db = new Database(context);
+            User_Database db = new User_Database(context);
             SQLiteDatabase database = db.getReadableDatabase();
 
             String statement = "SELECT password FROM " + LOGIN_PASSWORD_TABLE;
@@ -241,7 +284,7 @@ public class User {
             //isFirstTime will return false only aftter setting a login method,
             //after first HomePage onCreate
             boolean value = true;
-            Database db = new Database(context);
+            User_Database db = new User_Database(context);
             SQLiteDatabase database = db.getReadableDatabase();
 
             String statement = "SELECT first_time FROM " + FIRST_TIME_TABLE;
@@ -267,7 +310,7 @@ public class User {
     public static void setFirstTime(Context context, boolean firstTime){
         //updates the user isFirstTime variable directly in the database
         try {
-            Database db = new Database(context);
+            User_Database db = new User_Database(context);
             SQLiteDatabase database = db.getWritableDatabase();
 
             ContentValues cv = new ContentValues();

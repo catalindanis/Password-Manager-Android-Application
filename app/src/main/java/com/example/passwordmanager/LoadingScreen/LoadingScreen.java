@@ -1,45 +1,14 @@
 package com.example.passwordmanager.LoadingScreen;
 
-import android.Manifest;
-import android.app.ActivityOptions;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.Handler;
-import android.os.Looper;
-import android.transition.Explode;
-import android.transition.Fade;
-import android.transition.Slide;
-import android.util.Log;
-import android.view.MotionEvent;
-import android.view.Window;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
-import android.view.animation.DecelerateInterpolator;
-import android.widget.Toast;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
-import com.example.passwordmanager.Config.LoginType;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.passwordmanager.Config.RunningActivities;
 import com.example.passwordmanager.HomePage.HomePage;
-import com.example.passwordmanager.LoginPage.LoginPage;
 import com.example.passwordmanager.LoginPage.SetupLoginPage;
-import com.example.passwordmanager.LoginPage.SetupPasswordPage;
 import com.example.passwordmanager.R;
-import com.example.passwordmanager.User.Database;
-import com.example.passwordmanager.User.User;
-
-import java.io.*;
-import java.nio.Buffer;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Scanner;
 
 public class LoadingScreen extends AppCompatActivity{
     Class<?> cls = SetupLoginPage.class;

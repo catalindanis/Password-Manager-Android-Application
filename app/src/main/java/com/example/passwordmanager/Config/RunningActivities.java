@@ -22,4 +22,10 @@ public class RunningActivities {
                 activity.finishAfterTransition();
         }
     }
+
+    public static void finishAllActivities(){
+        for(AppCompatActivity activity : currentActivities){
+                activity.finishAfterTransition();
+        }
+    }
 }

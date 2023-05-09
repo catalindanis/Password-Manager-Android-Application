@@ -55,6 +55,8 @@ public class HomePage extends AppCompatActivity {
         initializeValues();
 
         setupListeners();
+
+        loadPasswords();
     }
 
     private void setupListeners() {
@@ -76,17 +78,7 @@ public class HomePage extends AppCompatActivity {
         //at every button, bring image layout to front, so that button don't come above it
         addButton.setOnClickListener((view) -> {
             addButtonIcon.bringToFront();
-//                View element = getLayoutInflater().inflate(R.layout.password, null);
-//                //ViewGroup parent = (ViewGroup) view.getParent();
-//                try {
-//                    //parent.removeView(view);
-//                    passwordListLayout.addView(element);
-//                    Log.d("COMMENT","SUCCES");
-//                }catch (Exception exception){
-//                    Log.d("COMMENT",exception.getMessage());
-//                }
             startActivity(new Intent(HomePage.this, AddPassword.class));
-            //startActivity(new Intent(HomePage.this, SetupPasswordPage.class));
         });
 
         settingsButton.setOnClickListener((view) -> {
@@ -114,6 +106,10 @@ public class HomePage extends AppCompatActivity {
         addButtonIcon = (ImageView) findViewById(R.id.imageView6);
         settingsButtonIcon = (ImageView) findViewById(R.id.imageView8);
         aboutButtonIcon = (ImageView) findViewById(R.id.imageView7);
+    }
+
+    public void loadPasswords(){
+
     }
 
     boolean doubleBackToExitPressedOnce = false;

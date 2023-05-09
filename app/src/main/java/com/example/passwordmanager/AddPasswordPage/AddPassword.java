@@ -4,6 +4,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.method.HideReturnsTransformationMethod;
@@ -16,9 +17,16 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
 
+import com.example.passwordmanager.Config.RunningActivities;
 import com.example.passwordmanager.HomePage.HomePage;
+import com.example.passwordmanager.Password.Password;
 import com.example.passwordmanager.R;
 import com.example.passwordmanager.SettingsPage.Settings;
+import com.example.passwordmanager.User.User;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class AddPassword extends AppCompatActivity {
 
@@ -27,6 +35,7 @@ public class AddPassword extends AppCompatActivity {
     EditText password;
     Switch showPassword;
     Button addButton;
+    Uri icon = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +48,7 @@ public class AddPassword extends AppCompatActivity {
     }
 
     private void setupListeners() {
+
         uploadIconButton.setOnClickListener((view) -> {
             Intent gallery = new Intent(Intent.ACTION_PICK);
             gallery.setData(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -57,6 +67,18 @@ public class AddPassword extends AppCompatActivity {
             }
 
         });
+
+        addButton.setOnClickListener((view) -> {
+            try {
+                InputStream iStream = getContentResolver().openInputStream(icon);
+                byte[] inputData = getBytes(iStream);
+                User.addPassword(this,email.getText().toString(),password.getText().toString(),inputData);
+                RunningActivities.finishAllActivities();
+                startActivity(new Intent(AddPassword.this,HomePage.class));
+            }catch (Exception exception){
+                //throw message
+            }
+        });
     }
 
     private void initializeValues() {
@@ -67,13 +89,25 @@ public class AddPassword extends AppCompatActivity {
         addButton = (Button) findViewById(R.id.addPasswordSave);
     }
 
+    public byte[] getBytes(InputStream inputStream) throws IOException {
+        ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+        int bufferSize = 1024;
+        byte[] buffer = new byte[bufferSize];
+
+        int len = 0;
+        while ((len = inputStream.read(buffer)) != -1) {
+            byteBuffer.write(buffer, 0, len);
+        }
+        return byteBuffer.toByteArray();
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         if(resultCode == RESULT_OK){
             if(requestCode == 1000){
-
+                icon = data.getData();
             }
         }
 
