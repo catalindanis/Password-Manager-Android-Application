@@ -14,23 +14,25 @@ import com.example.passwordmanager.Password.Passwords_Database;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.jasypt.util.text.AES256TextEncryptor;
+
 public class User {
-    private static LoginType loginType = LoginType.NULL;
-    private static List<Password> passwordList;
     private static final String LOGIN_TYPE_TABLE = "login_type";
     private static final String FIRST_TIME_TABLE = "first_time";
     private static final String LOGIN_PASSWORD_TABLE = "login_password";
     private static final String PASSWORDS_TABLE = "passwords";
     public static boolean addPassword(Context context, String email, String password, byte[] icon){
         try{
+            //adding a password directly in the passwords table
             Passwords_Database db = new Passwords_Database(context);
             SQLiteDatabase database = db.getWritableDatabase();
 
             ContentValues cv = new ContentValues();
             cv.put("email", email);
-            cv.put("password", password);
+            cv.put("password", encryptData(password));
             cv.put("icon",icon);
             database.insert(PASSWORDS_TABLE, null, cv);
 
@@ -38,15 +40,57 @@ public class User {
             return true;
         }
         catch (Exception exception){
+            //in case of an exception, a toast message is thrown, and action is cancelled
             Toast.makeText(context, ToastMessage.CANT_ADD_PASSWORD, Toast.LENGTH_SHORT).show();
             Log.d("COMMENT","ADD PASSWORD LEAD TO ERROR!");
+            Log.d("COMMENT",exception.getMessage());
+            ///TODO descarcat JCE, verificat adaugat parola fara poza, verificat algoritm encrypt decrypt.
             return false;
         }
     }
 
+    public static List<Password> getPasswords(Context context){
+        try {
+            //taking all the values from the password database and adding them to a list
+            //if list is empty, then we can directly return null, otherwise return the list
+            List<Password> passwordList = new ArrayList<>();
+
+            Passwords_Database db = new Passwords_Database(context);
+            SQLiteDatabase database = db.getReadableDatabase();
+
+            String statement = "SELECT * FROM " + PASSWORDS_TABLE;
+            Cursor cursor = database.rawQuery(statement, null);
+
+            while(cursor.moveToNext()) {
+                String email = cursor.getString(0);
+                String password = cursor.getString(1);
+                byte[] icon = cursor.getBlob(2);
+
+                Log.d("COMMENT","PASSWORD : " + password);
+
+                passwordList.add(new Password(email,password,icon));
+            }
+
+            cursor.close();
+            database.close();
+
+            Log.d("COMMENT","SUCCESSFULLY GOT " + passwordList.size() + " PASSWORDS!");
+
+            if(passwordList.size() == 0)
+                return null;
+            return passwordList;
+        } catch (Exception exception) {
+            //in case of an exception, a toast message is thrown, and null is returned
+            Toast.makeText(context, ToastMessage.CORRUPTED_FILES, Toast.LENGTH_SHORT).show();
+            Log.d("COMMENT","GET USER PASSWORDS LEAD TO ERROR!");
+            return null;
+        }
+    }
+
     public static boolean removePasswords(Context context){
+        //drops and recreates the desired table for the passwords
         try{
-            User_Database db = new User_Database(context);
+            Passwords_Database db = new Passwords_Database(context);
             SQLiteDatabase database = db.getWritableDatabase();
 
             String statement = "DROP TABLE " + PASSWORDS_TABLE;
@@ -59,6 +103,7 @@ public class User {
             return true;
         }
         catch (Exception exception){
+            //in case of an exception, a toast message is thrown, and action is cancelled
             Toast.makeText(context, ToastMessage.CORRUPTED_FILES, Toast.LENGTH_SHORT).show();
             Log.d("COMMENT","REMOVE PASSWORDS LEAD TO ERROR!");
             return false;
@@ -70,7 +115,7 @@ public class User {
         if(type == LoginType.NULL || type == LoginType.PASSWORD)
             return false;
         try {
-            loginType = type;
+            //loginType = type;
             User_Database db = new User_Database(context);
             SQLiteDatabase database = db.getWritableDatabase();
 
@@ -79,7 +124,7 @@ public class User {
             //in it's database table
             removeLoginType(context);
             ContentValues cv = new ContentValues();
-            cv.put("login_type", loginType.name());
+            cv.put("login_type", type.name());
             database.insert(LOGIN_TYPE_TABLE, null, cv);
 
             Log.d("COMMENT","SETTED UP USER LOGIN TYPE TO " + type.name());
@@ -97,12 +142,11 @@ public class User {
         if(type == LoginType.NULL || type == LoginType.BIOMETRICS)
             return false;
         try {
-            loginType = type;
             User_Database db = new User_Database(context);
             SQLiteDatabase database = db.getWritableDatabase();
 
             ContentValues login_type_value = new ContentValues();
-            login_type_value.put("login_type", loginType.name());
+            login_type_value.put("login_type", type.name());
 
             //removing the current loginType (just to be sure that the table
             //has no more than 1 element) and inserting the login type value
@@ -146,32 +190,29 @@ public class User {
         //is taken from the database and the loginType variable is changed and returned
         //if it isn't null, then we can directly return it, because it was
         //already readed from the database
-        if(loginType == LoginType.NULL) {
-            try {
-                User_Database db = new User_Database(context);
-                SQLiteDatabase database = db.getReadableDatabase();
+        try {
+            User_Database db = new User_Database(context);
+            SQLiteDatabase database = db.getReadableDatabase();
 
-                String statement = "SELECT login_type FROM " + LOGIN_TYPE_TABLE;
-                Cursor cursor = database.rawQuery(statement, null);
+            String statement = "SELECT login_type FROM " + LOGIN_TYPE_TABLE;
+            Cursor cursor = database.rawQuery(statement, null);
 
-                if (cursor.moveToFirst()) {
-                    String value = cursor.getString(0);
-                    loginType = LoginType.fromString(value);
-                }
-
-                cursor.close();
-                database.close();
-
-                Log.d("COMMENT","CURRENT USER LOGIN TYPE IS " + loginType.name());
-                return loginType;
-            } catch (Exception exception) {
-                //in case of an exception, a toast message is thrown, and LoginType.NULL is returned
-                Toast.makeText(context, ToastMessage.CORRUPTED_FILES, Toast.LENGTH_SHORT).show();
-                Log.d("COMMENT","GET USER LOGIN TYPE LEAD TO ERROR!");
-                return LoginType.NULL;
+            if (cursor.moveToFirst()) {
+                String value = cursor.getString(0);
+                setLoginType(context,LoginType.fromString(value));
             }
+
+            cursor.close();
+            database.close();
+
+            Log.d("COMMENT","CURRENT USER LOGIN TYPE IS " + getLoginType(context).name());
+            return getLoginType(context);
+        } catch (Exception exception) {
+            //in case of an exception, a toast message is thrown, and LoginType.NULL is returned
+            Toast.makeText(context, ToastMessage.CORRUPTED_FILES, Toast.LENGTH_SHORT).show();
+            Log.d("COMMENT","GET USER LOGIN TYPE LEAD TO ERROR!");
+            return LoginType.NULL;
         }
-        return loginType;
     }
 
     public static boolean removeLoginType(Context context){
@@ -323,5 +364,43 @@ public class User {
             Log.d("COMMENT","CHANGED USER FIRST TIME LEAD TO ERROR!");
         }
     }
+//    public static String encryptData(String data){
+//        //encrypting entered password
+//        String encryptedData = new String();
+//        try {
+//
+//            MessageDigest m = MessageDigest.getInstance("MD5");
+//            m.update(data.getBytes());
+//            byte[] bytes = m.digest();
+//            StringBuilder s = new StringBuilder();
+//            for (int i = 0; i < bytes.length; i++) {
+//                s.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+//            }
+//            encryptedData = s.toString();
+//
+//            return encryptedData;
+//        }catch (NoSuchAlgorithmException noSuchAlgorithmException){
+//            //in case of an exception false is returned
+//            Log.d("COMMENT","ENCRYPTING USER ENTERED PASSWORD LEAD TO ERROR!");
+//            return null;
+//        }
+//    }
+
+    private static String encryptData(String data)
+    {
+        AES256TextEncryptor aesEncryptor = new AES256TextEncryptor();
+        aesEncryptor.setPassword("mypassword");
+        String myEncryptedData = aesEncryptor.encrypt(data);
+        return myEncryptedData;
+    }
+
+    private static String DecryptPassword(String data)
+    {
+        AES256TextEncryptor aesEncryptor = new AES256TextEncryptor();
+        aesEncryptor.setPassword("mypassword");
+        String decryptedData = aesEncryptor.decrypt(data);
+        return decryptedData;
+    }
 }
+
 

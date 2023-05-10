@@ -3,6 +3,7 @@ package com.example.passwordmanager.AddPasswordPage;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,14 +11,18 @@ import android.provider.MediaStore;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.passwordmanager.Config.RunningActivities;
+import com.example.passwordmanager.Config.ToastMessage;
 import com.example.passwordmanager.HomePage.HomePage;
 import com.example.passwordmanager.Password.Password;
 import com.example.passwordmanager.R;
@@ -36,11 +41,14 @@ public class AddPassword extends AppCompatActivity {
     Switch showPassword;
     Button addButton;
     Uri icon = null;
+    TextView wrongPasswordMessage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_password);
+
+        RunningActivities.addActivity(this);
 
         initializeValues();
 
@@ -49,6 +57,7 @@ public class AddPassword extends AppCompatActivity {
 
     private void setupListeners() {
 
+        //choosing an image from galley as icon
         uploadIconButton.setOnClickListener((view) -> {
             Intent gallery = new Intent(Intent.ACTION_PICK);
             gallery.setData(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -56,6 +65,7 @@ public class AddPassword extends AppCompatActivity {
         });
 
         showPassword.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            //switch that toogles between hiding/not hiding the password
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked) {
@@ -69,14 +79,35 @@ public class AddPassword extends AppCompatActivity {
         });
 
         addButton.setOnClickListener((view) -> {
+
+
+            //hiding keyboard from phone screen
+            if (view != null) {
+                InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            }
+
+            if(email.getText().toString().length() == 0 || password.getText().toString().length() == 0) {
+                wrongPasswordMessage.setText("Make sure that none of a field is empty!");
+                return;
+            }
+
+            //transforming URI image in an input stream, re-transforming it into a byte array
+            byte[] inputData = null;
             try {
                 InputStream iStream = getContentResolver().openInputStream(icon);
-                byte[] inputData = getBytes(iStream);
-                User.addPassword(this,email.getText().toString(),password.getText().toString(),inputData);
-                RunningActivities.finishAllActivities();
-                startActivity(new Intent(AddPassword.this,HomePage.class));
+                inputData = getBytes(iStream);
+
             }catch (Exception exception){
-                //throw message
+                Toast.makeText(this, ToastMessage.BAD_IMAGE, Toast.LENGTH_SHORT).show();
+                Log.d("COMMENT","CAN'T TRANSFORM IMAGE IN BYTE ARRAY!");
+            }
+
+            //adding the password in database and finishing all activities
+            //and restarting HomePage activity so that the new password will be also loaded
+            if(User.addPassword(this,email.getText().toString(),password.getText().toString(),inputData)) {
+                RunningActivities.finishAllActivities();
+                startActivity(new Intent(AddPassword.this, HomePage.class));
             }
         });
     }
@@ -87,9 +118,11 @@ public class AddPassword extends AppCompatActivity {
         password = (EditText) findViewById(R.id.addPassword);
         showPassword = (Switch) findViewById(R.id.switch2);
         addButton = (Button) findViewById(R.id.addPasswordSave);
+        wrongPasswordMessage = (TextView) findViewById(R.id.addEmptyFields);
     }
 
     public byte[] getBytes(InputStream inputStream) throws IOException {
+        //transforming the inputStream image in a byte array
         ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
         int bufferSize = 1024;
         byte[] buffer = new byte[bufferSize];
@@ -105,6 +138,7 @@ public class AddPassword extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        //storing the image from the gallery in variable icon
         if(resultCode == RESULT_OK){
             if(requestCode == 1000){
                 icon = data.getData();

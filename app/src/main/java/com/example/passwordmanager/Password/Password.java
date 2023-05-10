@@ -6,11 +6,7 @@ import android.widget.ImageView;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
-
-@Entity(tableName = "Passwords")
 public class Password {
-    @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "id")
     private int id;
 
     public int getId() {
@@ -21,32 +17,31 @@ public class Password {
         this.id = id;
     }
 
-    @ColumnInfo(name = "password")
     private String password;
-    @ColumnInfo(name = "username")
-    private String username;
-    @ColumnInfo(name = "icon")
-    private Uri icon;
+    private String email;
+    private byte[] icon;
 
-    public String getUsername() {
-        return username;
+    public String getEmail() {
+        return email;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
-    public Uri getIcon() {
+    public byte[] getIcon() {
         return icon;
     }
 
-    public void setIcon(Uri icon) {
+    public void setIcon(byte[] icon) {
         this.icon = icon;
     }
 
-    public Password(String username, String password, Uri icon){
-        this.username = username;
+    public Password(String email, String password, byte[] icon){
+        this.email = email;
         this.password = password;
+        if(icon == null)
+            this.icon = autoGenerateIcon();
         this.icon = icon;
     }
 
@@ -56,5 +51,10 @@ public class Password {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    private byte[] autoGenerateIcon(){
+        byte[] icon = email.getBytes();
+        return icon;
     }
 }

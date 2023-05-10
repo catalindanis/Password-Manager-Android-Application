@@ -41,6 +41,7 @@ public class SetupPasswordPage extends AppCompatActivity {
 
     private void setupListeners() {
         showPassword.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            //switch that toogles between hiding/not hiding the password
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked) {
