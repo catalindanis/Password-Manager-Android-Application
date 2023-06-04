@@ -12,12 +12,27 @@ import com.example.passwordmanager.Config.LoginType;
 import com.example.passwordmanager.Password.Password;
 import com.example.passwordmanager.Password.Passwords_Database;
 
+import java.nio.ByteBuffer;
+import java.security.AlgorithmParameters;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import org.jasypt.util.text.AES256TextEncryptor;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.GCMParameterSpec;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
 
 public class User {
     private static final String LOGIN_TYPE_TABLE = "login_type";
@@ -34,6 +49,7 @@ public class User {
             cv.put("email", email);
             cv.put("password", encryptData(password));
             cv.put("icon",icon);
+
             database.insert(PASSWORDS_TABLE, null, cv);
 
             Log.d("COMMENT","ADDED PASSWORD SUCCESFULLY!");
@@ -44,7 +60,6 @@ public class User {
             Toast.makeText(context, ToastMessage.CANT_ADD_PASSWORD, Toast.LENGTH_SHORT).show();
             Log.d("COMMENT","ADD PASSWORD LEAD TO ERROR!");
             Log.d("COMMENT",exception.getMessage());
-            ///TODO descarcat JCE, verificat adaugat parola fara poza, verificat algoritm encrypt decrypt.
             return false;
         }
     }
@@ -62,13 +77,19 @@ public class User {
             Cursor cursor = database.rawQuery(statement, null);
 
             while(cursor.moveToNext()) {
-                String email = cursor.getString(0);
-                String password = cursor.getString(1);
-                byte[] icon = cursor.getBlob(2);
+                try {
+                    String email = cursor.getString(0);
+                    String password = cursor.getString(1);
+                    byte[] icon = cursor.getBlob(2);
 
-                Log.d("COMMENT","PASSWORD : " + password);
+                    Log.d("COMMENT", "PASSWORD : " + decryptData(password));
 
-                passwordList.add(new Password(email,password,icon));
+                    passwordList.add(new Password(email, password, icon));
+                }catch (Exception exception){
+                    //in case of an exception, a toast message is thrown, and it continues to next password
+                    Toast.makeText(context, ToastMessage.CANT_GET_PASSWORD, Toast.LENGTH_SHORT).show();
+                    Log.d("COMMENT","GET USER PASSWORD #" + cursor.getCount() + " LEAD TO ERROR!");
+                }
             }
 
             cursor.close();
@@ -96,7 +117,7 @@ public class User {
             String statement = "DROP TABLE " + PASSWORDS_TABLE;
             database.execSQL(statement);
 
-            statement = "CREATE TABLE " + PASSWORDS_TABLE + "(email varchar(255), password varchar(255), icon blob)";
+            statement = "CREATE TABLE " + PASSWORDS_TABLE + "(email varchar(255), password varchar(255), secret_key varchar(255), icon blob)";
             database.execSQL(statement);
 
             Log.d("COMMENT","REMOVED PASSWORDS");
@@ -338,7 +359,9 @@ public class User {
             cursor.close();
             database.close();
 
-            Log.d("COMMENT","CURRENT USER FIRST TIME IS " + (value ? "TRUE" : "FALSE"));
+            if(value)
+                Log.d("COMMENT","CURRENT USER FIRST TIME IS " + (value ? "TRUE" : "FALSE"));
+
             return value;
         }catch (Exception exception){
             //in case of an exception, a toast message is thrown, and the value true is returned
@@ -364,43 +387,65 @@ public class User {
             Log.d("COMMENT","CHANGED USER FIRST TIME LEAD TO ERROR!");
         }
     }
-//    public static String encryptData(String data){
-//        //encrypting entered password
-//        String encryptedData = new String();
-//        try {
-//
-//            MessageDigest m = MessageDigest.getInstance("MD5");
-//            m.update(data.getBytes());
-//            byte[] bytes = m.digest();
-//            StringBuilder s = new StringBuilder();
-//            for (int i = 0; i < bytes.length; i++) {
-//                s.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
-//            }
-//            encryptedData = s.toString();
-//
-//            return encryptedData;
-//        }catch (NoSuchAlgorithmException noSuchAlgorithmException){
-//            //in case of an exception false is returned
-//            Log.d("COMMENT","ENCRYPTING USER ENTERED PASSWORD LEAD TO ERROR!");
-//            return null;
-//        }
-//    }
 
-    private static String encryptData(String data)
-    {
-        AES256TextEncryptor aesEncryptor = new AES256TextEncryptor();
-        aesEncryptor.setPassword("mypassword");
-        String myEncryptedData = aesEncryptor.encrypt(data);
-        return myEncryptedData;
+    public static String encryptData(String word) throws Exception {
+        byte[] ivBytes;
+        String password="Hello";
+        /*you can give whatever you want for password. This is for testing purpose*/
+        SecureRandom random = new SecureRandom();
+        byte bytes[] = new byte[20];
+        random.nextBytes(bytes);
+        byte[] saltBytes = bytes;
+        // Derive the key
+        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+        PBEKeySpec spec = new PBEKeySpec(password.toCharArray(),saltBytes,65556,256);
+        SecretKey secretKey = factory.generateSecret(spec);
+        SecretKeySpec secret = new SecretKeySpec(secretKey.getEncoded(), "AES");
+        //encrypting the word
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        cipher.init(Cipher.ENCRYPT_MODE, secret);
+        AlgorithmParameters params = cipher.getParameters();
+        ivBytes =   params.getParameterSpec(IvParameterSpec.class).getIV();
+        byte[] encryptedTextBytes =                          cipher.doFinal(word.getBytes("UTF-8"));
+        //prepend salt and vi
+        byte[] buffer = new byte[saltBytes.length + ivBytes.length + encryptedTextBytes.length];
+        System.arraycopy(saltBytes, 0, buffer, 0, saltBytes.length);
+        System.arraycopy(ivBytes, 0, buffer, saltBytes.length, ivBytes.length);
+        System.arraycopy(encryptedTextBytes, 0, buffer, saltBytes.length + ivBytes.length, encryptedTextBytes.length);
+
+        return Base64.getEncoder().encodeToString(buffer);
     }
 
-    private static String DecryptPassword(String data)
-    {
-        AES256TextEncryptor aesEncryptor = new AES256TextEncryptor();
-        aesEncryptor.setPassword("mypassword");
-        String decryptedData = aesEncryptor.decrypt(data);
-        return decryptedData;
+    public static String decryptData(String encryptedText) throws Exception {
+        String password="Hello";
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        //strip off the salt and iv
+        ByteBuffer buffer = ByteBuffer.wrap(Base64.getDecoder().decode(encryptedText));
+        byte[] saltBytes = new byte[20];
+        buffer.get(saltBytes, 0, saltBytes.length);
+        byte[] ivBytes1 = new byte[cipher.getBlockSize()];
+        buffer.get(ivBytes1, 0, ivBytes1.length);
+        byte[] encryptedTextBytes = new byte[buffer.capacity() - saltBytes.length - ivBytes1.length];
+
+        buffer.get(encryptedTextBytes);
+        // Deriving the key
+        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+        PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), saltBytes, 65556, 256);
+        SecretKey secretKey = factory.generateSecret(spec);
+        SecretKeySpec secret = new SecretKeySpec(secretKey.getEncoded(), "AES");
+        cipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(ivBytes1));
+        byte[] decryptedTextBytes = null;
+        try {
+            decryptedTextBytes = cipher.doFinal(encryptedTextBytes);
+        } catch (IllegalBlockSizeException e) {
+            e.printStackTrace();
+        } catch (BadPaddingException e) {
+            e.printStackTrace();
+        }
+
+        return new String(decryptedTextBytes);
     }
 }
+
 
 

@@ -64,6 +64,8 @@ public class HomePage extends AppCompatActivity {
         if(User.isFirstTime(this))
             User.setFirstTime(this,false);
 
+        //User.removePasswords(this);
+
         initializeValues();
 
         setupListeners();
@@ -129,22 +131,25 @@ public class HomePage extends AppCompatActivity {
         }
 
         for(Password currentPassword : passwordList){
+            try {
+                View passwordLayout = getLayoutInflater().inflate(R.layout.password, null);
 
-            View passwordLayout = getLayoutInflater().inflate(R.layout.password,null);
+                TextView passwordEmail = (TextView) passwordLayout.findViewById(R.id.passwordEmail);
+                passwordEmail.setText(currentPassword.getEmail());
 
-            TextView passwordEmail = (TextView) passwordLayout.findViewById(R.id.passwordEmail);
-            passwordEmail.setText(currentPassword.getEmail());
+                ImageView passwordIcon = (ImageView) passwordLayout.findViewById(R.id.passwordIcon);
+                Bitmap bmp = BitmapFactory.decodeByteArray(currentPassword.getIcon(), 0, currentPassword.getIcon().length);
+                passwordIcon.setImageBitmap(bmp);
 
-            ImageView passwordIcon = (ImageView) passwordLayout.findViewById(R.id.passwordIcon);
-            Bitmap bmp = BitmapFactory.decodeByteArray(currentPassword.getIcon(), 0, currentPassword.getIcon().length);
-            passwordIcon.setImageBitmap(bmp);
+                ImageView editButton = (ImageView) passwordLayout.findViewById(R.id.passwordEdit);
+                editButton.setOnClickListener((view) -> {
+                    //edit Password
+                });
 
-            ImageView editButton = (ImageView) passwordLayout.findViewById(R.id.passwordEdit);
-            editButton.setOnClickListener((view) -> {
-                //edit Password
-            });
-
-            passwordListLayout.addView(passwordLayout);
+                passwordListLayout.addView(passwordLayout);
+            }catch (Exception exception){
+                Log.d("COMMENT",exception.getMessage());
+            }
         }
     }
 

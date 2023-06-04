@@ -7,7 +7,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.passwordmanager"
-        minSdk 21
+        minSdk 26
         targetSdk 33
         versionCode 1
         versionName "1.0"
@@ -28,18 +28,18 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.5.1'
-    implementation 'com.google.android.material:material:1.6.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.9.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     testImplementation 'junit:junit:4.+'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.4'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
-    implementation 'androidx.biometric:biometric:1.0.0-rc01'
-    implementation 'org.xerial:sqlite-jdbc:3.30.1'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    implementation 'androidx.biometric:biometric:1.2.0-alpha05'
+    implementation 'org.xerial:sqlite-jdbc:3.41.2.1'
     implementation "androidx.cardview:cardview:1.0.0"
     implementation 'org.jasypt:jasypt:1.9.3'
 
-    def room_version = "2.4.3"
+    def room_version = '2.5.1'
 
     implementation "androidx.room:room-runtime:$room_version"
     annotationProcessor "androidx.room:room-compiler:$room_version"
