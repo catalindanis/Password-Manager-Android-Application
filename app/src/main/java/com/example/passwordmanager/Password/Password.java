@@ -1,11 +1,28 @@
 package com.example.passwordmanager.Password;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.net.Uri;
+import android.util.Log;
 import android.widget.ImageView;
 
+import androidx.annotation.DrawableRes;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
+
+import com.example.passwordmanager.R;
+
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+
 public class Password {
     private int id;
 
@@ -37,12 +54,13 @@ public class Password {
         this.icon = icon;
     }
 
-    public Password(String email, String password, byte[] icon){
+    public Password(String email, String password, byte[] icon, Context context){
         this.email = email;
         this.password = password;
-        if(icon == null)
-            this.icon = autoGenerateIcon();
-        this.icon = icon;
+
+        if (icon == null)
+            this.icon = autoGenerateIcon(context);
+        else this.icon = icon;
     }
 
     public String getPassword() {
@@ -53,8 +71,7 @@ public class Password {
         this.password = password;
     }
 
-    private byte[] autoGenerateIcon(){
-        byte[] icon = email.getBytes();
-        return icon;
+    private byte[] autoGenerateIcon(Context context){
+        return context.getResources().getDrawable(R.mipmap.icon_a).toString().getBytes();
     }
 }

@@ -5,18 +5,25 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
+import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,10 +31,10 @@ import android.widget.Toast;
 import com.example.passwordmanager.Config.RunningActivities;
 import com.example.passwordmanager.Config.ToastMessage;
 import com.example.passwordmanager.HomePage.HomePage;
-import com.example.passwordmanager.Password.Password;
 import com.example.passwordmanager.R;
-import com.example.passwordmanager.SettingsPage.Settings;
 import com.example.passwordmanager.User.User;
+
+import org.w3c.dom.Text;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -36,12 +43,20 @@ import java.io.InputStream;
 public class AddPassword extends AppCompatActivity {
 
     RelativeLayout uploadIconButton;
+    ImageButton uploadIconButtonIcon;
     EditText email;
     EditText password;
     Switch showPassword;
     Button addButton;
     Uri icon = null;
     TextView wrongPasswordMessage;
+    ImageView spinnerArrow;
+    Spinner standardIconList;
+
+    TextView selectedFile;
+
+    ArrayAdapter<CharSequence> arrayAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +79,10 @@ public class AddPassword extends AppCompatActivity {
             startActivityForResult(gallery, 1000);
         });
 
+        uploadIconButtonIcon.setOnClickListener((view) -> {
+            uploadIconButton.performClick();
+        });
+
         showPassword.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             //switch that toogles between hiding/not hiding the password
             @Override
@@ -79,8 +98,6 @@ public class AddPassword extends AppCompatActivity {
         });
 
         addButton.setOnClickListener((view) -> {
-
-
             //hiding keyboard from phone screen
             if (view != null) {
                 InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -110,6 +127,21 @@ public class AddPassword extends AppCompatActivity {
                 startActivity(new Intent(AddPassword.this, HomePage.class));
             }
         });
+
+        spinnerArrow.setOnClickListener((view) -> {
+            standardIconList.performClick();
+        });
+        standardIconList.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                Log.d("COMMENT","NOTHING");
+            }
+        });
     }
 
     private void initializeValues() {
@@ -118,7 +150,12 @@ public class AddPassword extends AppCompatActivity {
         password = (EditText) findViewById(R.id.addPassword);
         showPassword = (Switch) findViewById(R.id.switch2);
         addButton = (Button) findViewById(R.id.addPasswordSave);
+        uploadIconButtonIcon = (ImageButton) findViewById(R.id.uploadIconButtonIcon);
         wrongPasswordMessage = (TextView) findViewById(R.id.addEmptyFields);
+        spinnerArrow = (ImageView) findViewById(R.id.spinnerArrow);
+        standardIconList = (Spinner) findViewById(R.id.spinner);
+        standardIconList.setAdapter(ArrayAdapter.createFromResource(this,R.array.iconList_beforeClick, R.layout.spinner_item));
+        selectedFile = (TextView) findViewById(R.id.selectedFile);
     }
 
     public byte[] getBytes(InputStream inputStream) throws IOException {
@@ -142,6 +179,7 @@ public class AddPassword extends AppCompatActivity {
         if(resultCode == RESULT_OK){
             if(requestCode == 1000){
                 icon = data.getData();
+                selectedFile.setText("Selected image: "+icon.getLastPathSegment());
             }
         }
 

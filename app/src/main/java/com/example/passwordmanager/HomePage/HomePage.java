@@ -131,25 +131,22 @@ public class HomePage extends AppCompatActivity {
         }
 
         for(Password currentPassword : passwordList){
-            try {
-                View passwordLayout = getLayoutInflater().inflate(R.layout.password, null);
 
-                TextView passwordEmail = (TextView) passwordLayout.findViewById(R.id.passwordEmail);
-                passwordEmail.setText(currentPassword.getEmail());
+            View passwordLayout = getLayoutInflater().inflate(R.layout.password, null);
 
-                ImageView passwordIcon = (ImageView) passwordLayout.findViewById(R.id.passwordIcon);
-                Bitmap bmp = BitmapFactory.decodeByteArray(currentPassword.getIcon(), 0, currentPassword.getIcon().length);
-                passwordIcon.setImageBitmap(bmp);
+            TextView passwordEmail = (TextView) passwordLayout.findViewById(R.id.passwordEmail);
+            passwordEmail.setText(currentPassword.getEmail());
 
-                ImageView editButton = (ImageView) passwordLayout.findViewById(R.id.passwordEdit);
-                editButton.setOnClickListener((view) -> {
-                    //edit Password
-                });
+            ImageView passwordIcon = (ImageView) passwordLayout.findViewById(R.id.passwordIcon);
+            Bitmap bmp = BitmapFactory.decodeByteArray(currentPassword.getIcon(), 0, currentPassword.getIcon().length);
+            passwordIcon.setImageBitmap(bmp);
 
-                passwordListLayout.addView(passwordLayout);
-            }catch (Exception exception){
-                Log.d("COMMENT",exception.getMessage());
-            }
+            ImageView editButton = (ImageView) passwordLayout.findViewById(R.id.passwordEdit);
+            editButton.setOnClickListener((view) -> {
+                //edit Password
+            });
+
+            passwordListLayout.addView(passwordLayout);
         }
     }
 

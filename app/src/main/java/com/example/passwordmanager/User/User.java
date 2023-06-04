@@ -84,11 +84,13 @@ public class User {
 
                     Log.d("COMMENT", "PASSWORD : " + decryptData(password));
 
-                    passwordList.add(new Password(email, password, icon));
+                    passwordList.add(new Password(email, password, icon, context));
+
                 }catch (Exception exception){
                     //in case of an exception, a toast message is thrown, and it continues to next password
                     Toast.makeText(context, ToastMessage.CANT_GET_PASSWORD, Toast.LENGTH_SHORT).show();
                     Log.d("COMMENT","GET USER PASSWORD #" + cursor.getCount() + " LEAD TO ERROR!");
+                    Log.d("COMMENT",exception.getMessage());
                 }
             }
 
@@ -117,7 +119,7 @@ public class User {
             String statement = "DROP TABLE " + PASSWORDS_TABLE;
             database.execSQL(statement);
 
-            statement = "CREATE TABLE " + PASSWORDS_TABLE + "(email varchar(255), password varchar(255), secret_key varchar(255), icon blob)";
+            statement = "CREATE TABLE " + PASSWORDS_TABLE + "(email varchar(255), password varchar(255), icon blob)";
             database.execSQL(statement);
 
             Log.d("COMMENT","REMOVED PASSWORDS");
