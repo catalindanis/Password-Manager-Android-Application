@@ -49,14 +49,12 @@ public class AddPassword extends AppCompatActivity {
     Switch showPassword;
     Button addButton;
     Uri icon = null;
-    TextView wrongPasswordMessage;
+    TextView wrongFieldsMessage;
     ImageView spinnerArrow;
     Spinner standardIconList;
-
     TextView selectedFile;
-
     ArrayAdapter<CharSequence> arrayAdapter;
-
+    String preInstalledIcon = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,19 +103,39 @@ public class AddPassword extends AppCompatActivity {
             }
 
             if(email.getText().toString().length() == 0 || password.getText().toString().length() == 0) {
-                wrongPasswordMessage.setText("Make sure that none of a field is empty!");
+                wrongFieldsMessage.setText("Make sure that none of a field is empty!");
                 return;
             }
 
             //transforming URI image in an input stream, re-transforming it into a byte array
             byte[] inputData = null;
-            try {
-                InputStream iStream = getContentResolver().openInputStream(icon);
-                inputData = getBytes(iStream);
 
-            }catch (Exception exception){
-                Toast.makeText(this, ToastMessage.BAD_IMAGE, Toast.LENGTH_SHORT).show();
-                Log.d("COMMENT","CAN'T TRANSFORM IMAGE IN BYTE ARRAY!");
+            if(icon != null) {
+                try {
+                    InputStream iStream = getContentResolver().openInputStream(icon);
+                    inputData = getBytes(iStream);
+
+                } catch (Exception exception) {
+                    Toast.makeText(this, ToastMessage.BAD_IMAGE, Toast.LENGTH_SHORT).show();
+                    Log.d("COMMENT", "CAN'T TRANSFORM IMAGE IN BYTE ARRAY!");
+                }
+            }
+            else if(preInstalledIcon != null){
+                icon = User.getPreinstalledIcon(this,preInstalledIcon);
+                if(icon != null){
+                    try {
+                        InputStream iStream = getContentResolver().openInputStream(icon);
+                        inputData = getBytes(iStream);
+
+                    } catch (Exception exception) {
+                        Toast.makeText(this, ToastMessage.BAD_IMAGE, Toast.LENGTH_SHORT).show();
+                        Log.d("COMMENT", "CAN'T TRANSFORM IMAGE IN BYTE ARRAY!");
+                        Log.d("COMMENT",exception.getMessage());
+                    }
+                }
+            }
+            else{
+
             }
 
             //adding the password in database and finishing all activities
@@ -134,12 +152,13 @@ public class AddPassword extends AppCompatActivity {
         standardIconList.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
+                if(!parent.getItemAtPosition(position).toString().equals("Pre-installed icons"))
+                    preInstalledIcon = parent.getItemAtPosition(position).toString();
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                Log.d("COMMENT","NOTHING");
+
             }
         });
     }
@@ -151,7 +170,7 @@ public class AddPassword extends AppCompatActivity {
         showPassword = (Switch) findViewById(R.id.switch2);
         addButton = (Button) findViewById(R.id.addPasswordSave);
         uploadIconButtonIcon = (ImageButton) findViewById(R.id.uploadIconButtonIcon);
-        wrongPasswordMessage = (TextView) findViewById(R.id.addEmptyFields);
+        wrongFieldsMessage = (TextView) findViewById(R.id.addEmptyFields);
         spinnerArrow = (ImageView) findViewById(R.id.spinnerArrow);
         standardIconList = (Spinner) findViewById(R.id.spinner);
         standardIconList.setAdapter(ArrayAdapter.createFromResource(this,R.array.iconList_beforeClick, R.layout.spinner_item));

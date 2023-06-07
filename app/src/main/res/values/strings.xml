@@ -19,21 +19,4 @@
         <item>Xbox</item>
     </string-array>
 
-    <string-array name="iconList_afterClick">
-        <item>None</item>
-        <item>Google</item>
-        <item>Steam</item>
-        <item>Instagram</item>
-        <item>Facebook</item>
-        <item>Discord</item>
-        <item>Paypal</item>
-        <item>Snapchat</item>
-        <item>Github</item>
-        <item>Bybit</item>
-        <item>Binance</item>
-        <item>Maxbounty</item>
-        <item>Epic Games</item>
-        <item>EA Desktop</item>
-        <item>Xbox</item>
-    </string-array>
 </resources>

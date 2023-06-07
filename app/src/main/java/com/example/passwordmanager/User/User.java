@@ -1,9 +1,12 @@
 package com.example.passwordmanager.User;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -11,7 +14,12 @@ import com.example.passwordmanager.Config.ToastMessage;
 import com.example.passwordmanager.Config.LoginType;
 import com.example.passwordmanager.Password.Password;
 import com.example.passwordmanager.Password.Passwords_Database;
+import com.example.passwordmanager.R;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.security.AlgorithmParameters;
 import java.security.MessageDigest;
@@ -106,6 +114,7 @@ public class User {
             //in case of an exception, a toast message is thrown, and null is returned
             Toast.makeText(context, ToastMessage.CORRUPTED_FILES, Toast.LENGTH_SHORT).show();
             Log.d("COMMENT","GET USER PASSWORDS LEAD TO ERROR!");
+            Log.d("COMMENT",exception.getMessage());
             return null;
         }
     }
@@ -129,6 +138,7 @@ public class User {
             //in case of an exception, a toast message is thrown, and action is cancelled
             Toast.makeText(context, ToastMessage.CORRUPTED_FILES, Toast.LENGTH_SHORT).show();
             Log.d("COMMENT","REMOVE PASSWORDS LEAD TO ERROR!");
+            Log.d("COMMENT",exception.getMessage());
             return false;
         }
     }
@@ -156,6 +166,7 @@ public class User {
             //in case of an exception, a toast message is thrown, and action is cancelled
             Toast.makeText(context, ToastMessage.CORRUPTED_FILES, Toast.LENGTH_SHORT).show();
             Log.d("COMMENT","SET USER LOGIN TYPE LEAD TO ERROR!");
+            Log.d("COMMENT",exception.getMessage());
             return false;
         }
     }
@@ -204,6 +215,7 @@ public class User {
             //in case of an exception, a toast message is thrown, and action is cancelled
             Toast.makeText(context, ToastMessage.CORRUPTED_FILES, Toast.LENGTH_SHORT).show();
             Log.d("COMMENT","SET USER LOGIN TYPE OR LOGIN PASSWORD LEAD TO ERROR!");
+            Log.d("COMMENT",exception.getMessage());
             return false;
         }
     }
@@ -234,6 +246,7 @@ public class User {
             //in case of an exception, a toast message is thrown, and LoginType.NULL is returned
             Toast.makeText(context, ToastMessage.CORRUPTED_FILES, Toast.LENGTH_SHORT).show();
             Log.d("COMMENT","GET USER LOGIN TYPE LEAD TO ERROR!");
+            Log.d("COMMENT",exception.getMessage());
             return LoginType.NULL;
         }
     }
@@ -256,6 +269,7 @@ public class User {
             //in case of an exception, a toast message is thrown, and action is cancelled
             Toast.makeText(context, ToastMessage.CORRUPTED_FILES, Toast.LENGTH_SHORT).show();
             Log.d("COMMENT","REMOVE USER LOGIN TYPE LEAD TO ERROR!");
+            Log.d("COMMENT",exception.getMessage());
         }
         return false;
     }
@@ -278,6 +292,7 @@ public class User {
             //in case of an exception, a toast message is thrown, and action is cancelled
             Toast.makeText(context, ToastMessage.CORRUPTED_FILES, Toast.LENGTH_SHORT).show();
             Log.d("COMMENT","REMOVE USER LOGIN PASSWORD LEAD TO ERROR!");
+            Log.d("COMMENT",exception.getMessage());
         }
         return false;
     }
@@ -297,6 +312,7 @@ public class User {
         }catch (NoSuchAlgorithmException noSuchAlgorithmException){
             //in case of an exception false is returned
             Log.d("COMMENT","ENCRYPTING USER ENTERED PASSWORD LEAD TO ERROR!");
+            Log.d("COMMENT",noSuchAlgorithmException.getMessage());
             return false;
         }
 
@@ -309,6 +325,7 @@ public class User {
             Log.d("COMMENT", "PASSWORDS NOT MATCH");
         }catch (NullPointerException nullPointerException){
             Log.d("COMMENT","ENCRYPTED PASSWORD FROM THE DATABASE IS NULL!");
+            Log.d("COMMENT",nullPointerException.getMessage());
         }
         return false;
     }
@@ -336,6 +353,7 @@ public class User {
             //in case of an exception, a toast message is thrown, and null is returned
             Toast.makeText(context, ToastMessage.CORRUPTED_FILES, Toast.LENGTH_SHORT).show();
             Log.d("COMMENT","GET USER LOGIN PASSWORD LEAD TO ERROR!");
+            Log.d("COMMENT",exception.getMessage());
         }
 
         return null;
@@ -369,6 +387,7 @@ public class User {
             //in case of an exception, a toast message is thrown, and the value true is returned
             Toast.makeText(context, ToastMessage.CORRUPTED_FILES, Toast.LENGTH_SHORT).show();
             Log.d("COMMENT","GET USER FIRST TIME LEAD TO ERROR!");
+            Log.d("COMMENT",exception.getMessage());
         }
         return true;
     }
@@ -387,6 +406,7 @@ public class User {
             //in case of an exception, a toast message is thrown, and the action is cancelled
             Toast.makeText(context, ToastMessage.CORRUPTED_FILES, Toast.LENGTH_SHORT).show();
             Log.d("COMMENT","CHANGED USER FIRST TIME LEAD TO ERROR!");
+            Log.d("COMMENT",exception.getMessage());
         }
     }
 
@@ -446,6 +466,78 @@ public class User {
         }
 
         return new String(decryptedTextBytes);
+    }
+
+    public static Uri getPreinstalledIcon(Context context, String preInstalledIcon) {
+        Resources resources = context.getResources();
+        int id = -1;
+        switch (preInstalledIcon) {
+            case "Google":
+                id = R.drawable.settings;
+                break;
+            case "Steam":
+                id = R.drawable.settings;
+                break;
+            case "Instagram":
+                id = R.drawable.settings;
+                break;
+            case "Facebook":
+                id = R.drawable.settings;
+                break;
+            case "Discord":
+                id = R.drawable.settings;
+                break;
+            case "Paypal":
+                id = R.drawable.settings;
+                break;
+            case "Snapchat":
+                id = R.drawable.settings;
+                break;
+            case "Github":
+                id = R.drawable.settings;
+                break;
+            case "Bybit":
+                id = R.drawable.settings;
+                break;
+            case "Binance":
+                id = R.drawable.settings;
+                break;
+            case "Maxbounty":
+                id = R.drawable.settings;
+                break;
+            case "Epic Games":
+                id = R.drawable.settings;
+                break;
+            case "EA Desktop":
+                id = R.drawable.settings;
+                break;
+            case "Xbox":
+                id = R.drawable.settings;
+                break;
+        }
+
+        if(id == -1)
+            return null;
+
+        return new Uri.Builder()
+                .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
+                .authority(resources.getResourcePackageName(id))
+                .appendPath(resources.getResourceTypeName(id))
+                .appendPath(resources.getResourceEntryName(id))
+                .build();
+    }
+
+    public byte[] getBytes(InputStream inputStream) throws IOException {
+        //transforming the inputStream image in a byte array
+        ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+        int bufferSize = 1024;
+        byte[] buffer = new byte[bufferSize];
+
+        int len = 0;
+        while ((len = inputStream.read(buffer)) != -1) {
+            byteBuffer.write(buffer, 0, len);
+        }
+        return byteBuffer.toByteArray();
     }
 }
 
