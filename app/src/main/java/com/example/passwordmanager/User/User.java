@@ -473,46 +473,46 @@ public class User {
         int id = -1;
         switch (preInstalledIcon) {
             case "Google":
-                id = R.drawable.settings;
+                id = R.drawable.google;
                 break;
             case "Steam":
-                id = R.drawable.settings;
+                id = R.drawable.steam;
                 break;
             case "Instagram":
-                id = R.drawable.settings;
+                id = R.drawable.instagram;
                 break;
             case "Facebook":
-                id = R.drawable.settings;
+                id = R.drawable.facebook;
                 break;
             case "Discord":
-                id = R.drawable.settings;
+                id = R.drawable.discord;
                 break;
             case "Paypal":
-                id = R.drawable.settings;
+                id = R.drawable.paypal;
                 break;
             case "Snapchat":
-                id = R.drawable.settings;
+                id = R.drawable.snapchat;
                 break;
             case "Github":
-                id = R.drawable.settings;
+                id = R.drawable.github;
                 break;
             case "Bybit":
-                id = R.drawable.settings;
+                id = R.drawable.bybit;
                 break;
             case "Binance":
-                id = R.drawable.settings;
+                id = R.drawable.binance;
                 break;
             case "Maxbounty":
-                id = R.drawable.settings;
+                id = R.drawable.maxbounty;
                 break;
             case "Epic Games":
-                id = R.drawable.settings;
+                id = R.drawable.epicgames;
                 break;
             case "EA Desktop":
-                id = R.drawable.settings;
+                id = R.drawable.eadesktop;
                 break;
             case "Xbox":
-                id = R.drawable.settings;
+                id = R.drawable.xbox;
                 break;
         }
 

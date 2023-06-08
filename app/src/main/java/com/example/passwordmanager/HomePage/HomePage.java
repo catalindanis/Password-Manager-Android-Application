@@ -135,7 +135,7 @@ public class HomePage extends AppCompatActivity {
             View passwordLayout = getLayoutInflater().inflate(R.layout.password, null);
 
             TextView passwordEmail = (TextView) passwordLayout.findViewById(R.id.passwordEmail);
-            passwordEmail.setText(currentPassword.getEmail());
+            passwordEmail.setText(currentPassword.getEmail().substring(0,currentPassword.getEmail().length() > 14 ? 14 : currentPassword.getEmail().length()).split("@")[0]);
 
             ImageView passwordIcon = (ImageView) passwordLayout.findViewById(R.id.passwordIcon);
             Bitmap bmp = BitmapFactory.decodeByteArray(currentPassword.getIcon(), 0, currentPassword.getIcon().length);
