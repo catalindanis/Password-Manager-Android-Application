@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.util.Log;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.passwordmanager.Config.ToastMessage;
@@ -17,7 +18,6 @@ import com.example.passwordmanager.Password.Passwords_Database;
 import com.example.passwordmanager.R;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -29,15 +29,11 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
-import org.jasypt.util.text.AES256TextEncryptor;
-
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
@@ -47,6 +43,7 @@ public class User {
     private static final String FIRST_TIME_TABLE = "first_time";
     private static final String LOGIN_PASSWORD_TABLE = "login_password";
     private static final String PASSWORDS_TABLE = "passwords";
+    private static int[] autoGenIcons = new int[100];
     public static boolean addPassword(Context context, String email, String password, byte[] icon){
         try{
             //adding a password directly in the passwords table
@@ -116,6 +113,27 @@ public class User {
             Log.d("COMMENT","GET USER PASSWORDS LEAD TO ERROR!");
             Log.d("COMMENT",exception.getMessage());
             return null;
+        }
+    }
+
+    public static boolean removePassword(Context context, String email, String password){
+        try{
+            //removing a password directly in the passwords table
+            Passwords_Database db = new Passwords_Database(context);
+            SQLiteDatabase database = db.getWritableDatabase();
+
+            String statement = "DELETE FROM " + PASSWORDS_TABLE + " WHERE email=\""+ email + "\" AND password=\"" + password + "\";";
+            database.execSQL(statement);
+
+            Log.d("COMMENT","REMOVED PASSWORD SUCCESFULLY!");
+            return true;
+        }
+        catch (Exception exception){
+            //in case of an exception, a toast message is thrown, and action is cancelled
+            Toast.makeText(context, ToastMessage.CANT_ADD_PASSWORD, Toast.LENGTH_SHORT).show();
+            Log.d("COMMENT","REMOVE PASSWORD LEAD TO ERROR!");
+            Log.d("COMMENT",exception.getMessage());
+            return false;
         }
     }
 
@@ -438,34 +456,39 @@ public class User {
         return Base64.getEncoder().encodeToString(buffer);
     }
 
-    public static String decryptData(String encryptedText) throws Exception {
-        String password="Hello";
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        //strip off the salt and iv
-        ByteBuffer buffer = ByteBuffer.wrap(Base64.getDecoder().decode(encryptedText));
-        byte[] saltBytes = new byte[20];
-        buffer.get(saltBytes, 0, saltBytes.length);
-        byte[] ivBytes1 = new byte[cipher.getBlockSize()];
-        buffer.get(ivBytes1, 0, ivBytes1.length);
-        byte[] encryptedTextBytes = new byte[buffer.capacity() - saltBytes.length - ivBytes1.length];
-
-        buffer.get(encryptedTextBytes);
-        // Deriving the key
-        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-        PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), saltBytes, 65556, 256);
-        SecretKey secretKey = factory.generateSecret(spec);
-        SecretKeySpec secret = new SecretKeySpec(secretKey.getEncoded(), "AES");
-        cipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(ivBytes1));
-        byte[] decryptedTextBytes = null;
+    public static String decryptData(String encryptedText){
         try {
-            decryptedTextBytes = cipher.doFinal(encryptedTextBytes);
-        } catch (IllegalBlockSizeException e) {
-            e.printStackTrace();
-        } catch (BadPaddingException e) {
-            e.printStackTrace();
-        }
+            String password = "Hello";
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            //strip off the salt and iv
+            ByteBuffer buffer = ByteBuffer.wrap(Base64.getDecoder().decode(encryptedText));
+            byte[] saltBytes = new byte[20];
+            buffer.get(saltBytes, 0, saltBytes.length);
+            byte[] ivBytes1 = new byte[cipher.getBlockSize()];
+            buffer.get(ivBytes1, 0, ivBytes1.length);
+            byte[] encryptedTextBytes = new byte[buffer.capacity() - saltBytes.length - ivBytes1.length];
 
-        return new String(decryptedTextBytes);
+            buffer.get(encryptedTextBytes);
+            // Deriving the key
+            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+            PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), saltBytes, 65556, 256);
+            SecretKey secretKey = factory.generateSecret(spec);
+            SecretKeySpec secret = new SecretKeySpec(secretKey.getEncoded(), "AES");
+            cipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(ivBytes1));
+            byte[] decryptedTextBytes = null;
+            try {
+                decryptedTextBytes = cipher.doFinal(encryptedTextBytes);
+            } catch (IllegalBlockSizeException e) {
+                e.printStackTrace();
+            } catch (BadPaddingException e) {
+                e.printStackTrace();
+            }
+
+            return new String(decryptedTextBytes);
+        }catch (Exception exception){
+
+        }
+        return null;
     }
 
     public static Uri getPreinstalledIcon(Context context, String preInstalledIcon) {
@@ -474,6 +497,9 @@ public class User {
         switch (preInstalledIcon) {
             case "Google":
                 id = R.drawable.google;
+                break;
+            case "Gmail":
+                id = R.drawable.gmail;
                 break;
             case "Steam":
                 id = R.drawable.steam;
@@ -527,6 +553,23 @@ public class User {
                 .build();
     }
 
+    public static Uri getAutoIcon(Context context, EditText email) {
+        Resources resources = context.getResources();
+        int id;
+
+        if(email.getText().toString().toLowerCase().charAt(0) >= 'a' && email.getText().toString().toLowerCase().charAt(0) <= 'z')
+            id = autoGenIcons[email.getText().toString().toLowerCase().charAt(0) - 'a'];
+        else id = autoGenIcons[26];
+
+        return new Uri.Builder()
+                .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
+                .authority(resources.getResourcePackageName(id))
+                .appendPath(resources.getResourceTypeName(id))
+                .appendPath(resources.getResourceEntryName(id))
+                .build();
+
+    }
+
     public byte[] getBytes(InputStream inputStream) throws IOException {
         //transforming the inputStream image in a byte array
         ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
@@ -538,6 +581,36 @@ public class User {
             byteBuffer.write(buffer, 0, len);
         }
         return byteBuffer.toByteArray();
+    }
+
+    public static void init(){
+        autoGenIcons[0] = R.drawable.a;
+        autoGenIcons[1] = R.drawable.b;
+        autoGenIcons[2] = R.drawable.c;
+        autoGenIcons[3] = R.drawable.d;
+        autoGenIcons[4] = R.drawable.e;
+        autoGenIcons[5] = R.drawable.f;
+        autoGenIcons[6] = R.drawable.g;
+        autoGenIcons[7] = R.drawable.h;
+        autoGenIcons[8] = R.drawable.i;
+        autoGenIcons[9] = R.drawable.j;
+        autoGenIcons[10] = R.drawable.k;
+        autoGenIcons[11] = R.drawable.l;
+        autoGenIcons[12] = R.drawable.m;
+        autoGenIcons[13] = R.drawable.n;
+        autoGenIcons[14] = R.drawable.o;
+        autoGenIcons[15] = R.drawable.p;
+        autoGenIcons[16] = R.drawable.q;
+        autoGenIcons[17] = R.drawable.r;
+        autoGenIcons[18] = R.drawable.s;
+        autoGenIcons[19] = R.drawable.t;
+        autoGenIcons[20] = R.drawable.u;
+        autoGenIcons[21] = R.drawable.v;
+        autoGenIcons[22] = R.drawable.w;
+        autoGenIcons[23] = R.drawable.x;
+        autoGenIcons[24] = R.drawable.y;
+        autoGenIcons[25] = R.drawable.z;
+        autoGenIcons[26] = R.drawable.unknown;
     }
 }
 

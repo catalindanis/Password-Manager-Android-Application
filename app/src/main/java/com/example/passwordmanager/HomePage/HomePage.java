@@ -12,8 +12,6 @@ import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -25,17 +23,10 @@ import com.example.passwordmanager.AddPasswordPage.AddPassword;
 import com.example.passwordmanager.Config.OnSwipeTouchListener;
 import com.example.passwordmanager.Config.RunningActivities;
 import com.example.passwordmanager.Config.ToastMessage;
-import com.example.passwordmanager.LoginPage.SetupPasswordPage;
 import com.example.passwordmanager.Password.Password;
 import com.example.passwordmanager.R;
 import com.example.passwordmanager.SettingsPage.Settings;
 import com.example.passwordmanager.User.User;
-
-import java.io.UnsupportedEncodingException;
-import android.net.Uri;
-
-import java.net.URI;
-import java.util.List;
 
 public class HomePage extends AppCompatActivity {
 
@@ -65,6 +56,7 @@ public class HomePage extends AppCompatActivity {
             User.setFirstTime(this,false);
 
         //User.removePasswords(this);
+        User.init();
 
         initializeValues();
 
@@ -123,14 +115,15 @@ public class HomePage extends AppCompatActivity {
     }
 
     public void loadPasswords(){
-        List<Password> passwordList = User.getPasswords(this);
 
-        if(passwordList == null) {
+
+        if(User.getPasswords(this) == null) {
             Log.d("COMMENT","THERE ARE NO PASSWORDS ADDED!");
             return;
         }
 
-        for(Password currentPassword : passwordList){
+        int id = 0;
+        for(Password currentPassword : User.getPasswords(this)){
 
             View passwordLayout = getLayoutInflater().inflate(R.layout.password, null);
 
@@ -142,11 +135,19 @@ public class HomePage extends AppCompatActivity {
             passwordIcon.setImageBitmap(bmp);
 
             ImageView editButton = (ImageView) passwordLayout.findViewById(R.id.passwordEdit);
+            int finalId = id;
             editButton.setOnClickListener((view) -> {
-                //edit Password
+                Intent intent = new Intent(this,AddPassword.class);
+                intent.putExtra("edit",true);
+                intent.putExtra("email",currentPassword.getEmail());
+                intent.putExtra("password",currentPassword.getPassword());
+                intent.putExtra("icon",currentPassword.getIcon());
+                startActivity(intent);
             });
 
             passwordListLayout.addView(passwordLayout);
+
+            id++;
         }
     }
 

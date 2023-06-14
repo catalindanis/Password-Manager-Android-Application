@@ -4,6 +4,7 @@
     <string-array name="iconList_beforeClick">
         <item>Pre-installed icons</item>
         <item>Google</item>
+        <item>Gmail</item>
         <item>Steam</item>
         <item>Instagram</item>
         <item>Facebook</item>
