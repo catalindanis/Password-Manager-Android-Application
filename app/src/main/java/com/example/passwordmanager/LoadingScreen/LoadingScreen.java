@@ -31,10 +31,7 @@ public class LoadingScreen extends AppCompatActivity{
 
         RunningActivities.addActivity(this);
 
-        //User.removeLoginType(this);
-        //User.removePasswords(this);
-
-        //loading screen backend processes
+        //starting desired class after loading processes are finished
         Handler handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(new Runnable() {
             @Override
@@ -63,7 +60,6 @@ public class LoadingScreen extends AppCompatActivity{
                 User.init(getApplicationContext());
             }
         }).start();
-
     }
 
     //block user from exiting app when it is in loading screen

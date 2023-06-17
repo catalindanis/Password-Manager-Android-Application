@@ -4,6 +4,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -45,6 +48,8 @@ public class HomePage extends AppCompatActivity {
     ImageView settingsButtonIcon;
     ImageView aboutButtonIcon;
 
+    ImageView menuButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,14 +75,54 @@ public class HomePage extends AppCompatActivity {
             @Override
             public void onSwipeRight() {
                 menuLayout.setVisibility(View.VISIBLE);
+
+                menuLayout.animate()
+                        .translationX(0)
+                        .setListener(null)
+                        .setDuration(250);
+
                 //bring layout to front, so that scrollview don't block user from pressing the buttons
                 menuLayout.bringToFront();
             }
 
             @Override
             public void onSwipeLeft() {
-                menuLayout.setVisibility(View.INVISIBLE);
+                menuLayout.animate()
+                        .translationX(-menuLayout.getWidth())
+                        .setDuration(250)
+                        .setListener(new AnimatorListenerAdapter() {
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                super.onAnimationEnd(animation);
+                                menuLayout.setVisibility(View.INVISIBLE);
+                            }
+                        });
             }
+        });
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(!isFinishing()){
+                    if(menuLayout.getVisibility() == View.VISIBLE)
+                        scrollView.setAlpha(0.4f);
+                    else scrollView.setAlpha(1);
+                }
+            }
+        }).start();
+
+        menuButton.setOnClickListener(view -> {
+            menuLayout.setVisibility(View.VISIBLE);
+
+            menuLayout.animate()
+                    .translationX(0)
+                    .setListener(null)
+                    .setDuration(250);
+
+            //bring layout to front, so that scrollview don't block user from pressing the buttons
+            menuLayout.bringToFront();
+
+            scrollView.animate().setDuration(250).alpha(0.4f);
         });
 
 
@@ -85,6 +130,7 @@ public class HomePage extends AppCompatActivity {
         addButton.setOnClickListener((view) -> {
             addButtonIcon.bringToFront();
 
+            menuLayout.setVisibility(View.INVISIBLE);
             startActivity(new Intent(HomePage.this, AddPassword.class));
             overridePendingTransition(R.anim.slide_from_right,R.anim.slide_to_left);
         });
@@ -92,6 +138,7 @@ public class HomePage extends AppCompatActivity {
         settingsButton.setOnClickListener((view) -> {
             settingsButtonIcon.bringToFront();
 
+            menuLayout.setVisibility(View.INVISIBLE);
             startActivity(new Intent(HomePage.this, Settings.class));
             overridePendingTransition(R.anim.slide_from_right,R.anim.slide_to_left);
         });
@@ -99,6 +146,7 @@ public class HomePage extends AppCompatActivity {
         aboutButton.setOnClickListener((view) -> {
             aboutButtonIcon.bringToFront();
 
+            menuLayout.setVisibility(View.INVISIBLE);
             startActivity(new Intent(HomePage.this, About.class));
             overridePendingTransition(R.anim.slide_from_right,R.anim.slide_to_left);
         });
@@ -112,10 +160,11 @@ public class HomePage extends AppCompatActivity {
         addButton = (Button) findViewById(R.id.addButton);
         settingsButton = (Button) findViewById(R.id.settingsButton);
         aboutButton = (Button) findViewById(R.id.aboutButton);
-        menuLayout.setVisibility(View.INVISIBLE);
         addButtonIcon = (ImageView) findViewById(R.id.imageView6);
         settingsButtonIcon = (ImageView) findViewById(R.id.imageView8);
         aboutButtonIcon = (ImageView) findViewById(R.id.imageView7);
+        menuButton = (ImageView) findViewById(R.id.menuButton);
+        menuLayout.setVisibility(View.INVISIBLE);
     }
 
     public void loadPasswords(){
@@ -177,5 +226,11 @@ public class HomePage extends AppCompatActivity {
         Toast.makeText(this, ToastMessage.PRESS_DOUBLE_TO_EXIT, Toast.LENGTH_SHORT).show();
 
         new Handler(Looper.getMainLooper()).postDelayed(() -> doubleBackToExitPressedOnce=false, 2000);
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        menuLayout.setX(-menuLayout.getWidth());
     }
 }

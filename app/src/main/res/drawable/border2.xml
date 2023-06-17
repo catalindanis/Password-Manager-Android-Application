@@ -1,6 +1,6 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <solid android:color="@color/app_test" />
+    <solid android:color="@color/app_mid_blue" />
 
     <stroke
             android:width="7px"
