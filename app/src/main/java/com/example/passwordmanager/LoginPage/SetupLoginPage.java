@@ -52,6 +52,7 @@ public class SetupLoginPage extends AppCompatActivity {
 
         loginPasswordType.setOnClickListener((view) -> {
             startActivity(new Intent(SetupLoginPage.this, SetupPasswordPage.class));
+            overridePendingTransition(R.anim.zoom_in,R.anim.static_animation);
         });
 
         loginBioType.setOnClickListener((view) -> {
@@ -68,6 +69,7 @@ public class SetupLoginPage extends AppCompatActivity {
                         super.onAuthenticationSucceeded(result);
                         if(User.setLoginType(getApplicationContext(), LoginType.BIOMETRICS))
                             startActivity(new Intent(SetupLoginPage.this, HomePage.class));
+                            overridePendingTransition(R.anim.zoom_in,R.anim.static_animation);
                     }
 
                     @Override

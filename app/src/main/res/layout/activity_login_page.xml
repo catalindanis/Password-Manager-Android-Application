@@ -16,6 +16,7 @@
         android:ems="10"
         android:inputType="textPassword"
         android:paddingLeft="25px"
+        android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.533"
@@ -59,20 +60,17 @@
         android:id="@+id/switch1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="195dp"
+        android:layout_marginTop="16dp"
         android:fontFamily="@font/nunitobold"
         android:text="Show password"
         android:textColor="#a294bc"
         android:textSize="50px"
         android:thumbTint="	#a294bc"
         android:trackTint="	#a294bc"
-        app:layout_constraintBottom_toTopOf="@+id/setupPasswordContinue"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.181"
+        app:layout_constraintHorizontal_bias="0.081"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/setupPassword"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toBottomOf="@+id/setupPassword" />
 
     <TextView
         android:id="@+id/textView3"

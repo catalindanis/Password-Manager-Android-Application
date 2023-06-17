@@ -1,5 +1,6 @@
 package com.example.passwordmanager.HomePage;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
@@ -12,6 +13,7 @@ import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -23,6 +25,7 @@ import com.example.passwordmanager.AddPasswordPage.AddPassword;
 import com.example.passwordmanager.Config.OnSwipeTouchListener;
 import com.example.passwordmanager.Config.RunningActivities;
 import com.example.passwordmanager.Config.ToastMessage;
+import com.example.passwordmanager.LoginPage.LoginPage;
 import com.example.passwordmanager.Password.Password;
 import com.example.passwordmanager.R;
 import com.example.passwordmanager.SettingsPage.Settings;
@@ -55,9 +58,6 @@ public class HomePage extends AppCompatActivity {
         if(User.isFirstTime(this))
             User.setFirstTime(this,false);
 
-        //User.removePasswords(this);
-        User.init();
-
         initializeValues();
 
         setupListeners();
@@ -84,19 +84,23 @@ public class HomePage extends AppCompatActivity {
         //at every button, bring image layout to front, so that button don't come above it
         addButton.setOnClickListener((view) -> {
             addButtonIcon.bringToFront();
+
             startActivity(new Intent(HomePage.this, AddPassword.class));
+            overridePendingTransition(R.anim.slide_from_right,R.anim.slide_to_left);
         });
 
         settingsButton.setOnClickListener((view) -> {
             settingsButtonIcon.bringToFront();
 
             startActivity(new Intent(HomePage.this, Settings.class));
+            overridePendingTransition(R.anim.slide_from_right,R.anim.slide_to_left);
         });
 
         aboutButton.setOnClickListener((view) -> {
             aboutButtonIcon.bringToFront();
 
             startActivity(new Intent(HomePage.this, About.class));
+            overridePendingTransition(R.anim.slide_from_right,R.anim.slide_to_left);
         });
     }
 
@@ -116,14 +120,13 @@ public class HomePage extends AppCompatActivity {
 
     public void loadPasswords(){
 
-
-        if(User.getPasswords(this) == null) {
-            Log.d("COMMENT","THERE ARE NO PASSWORDS ADDED!");
+        if(User.getPasswords().size() == 0) {
+            //Log.d("COMMENT","THERE ARE NO PASSWORDS ADDED!");
             return;
         }
 
-        int id = 0;
-        for(Password currentPassword : User.getPasswords(this)){
+        //int id = 0;
+        for(Password currentPassword : User.getPasswords()){
 
             View passwordLayout = getLayoutInflater().inflate(R.layout.password, null);
 
@@ -135,20 +138,31 @@ public class HomePage extends AppCompatActivity {
             passwordIcon.setImageBitmap(bmp);
 
             ImageView editButton = (ImageView) passwordLayout.findViewById(R.id.passwordEdit);
-            int finalId = id;
-            editButton.setOnClickListener((view) -> {
-                Intent intent = new Intent(this,AddPassword.class);
-                intent.putExtra("edit",true);
-                intent.putExtra("email",currentPassword.getEmail());
-                intent.putExtra("password",currentPassword.getPassword());
-                intent.putExtra("icon",currentPassword.getIcon());
-                startActivity(intent);
-            });
+            //int finalId = id;
 
             passwordListLayout.addView(passwordLayout);
 
-            id++;
+            editButton.setOnClickListener((view) -> {
+                Intent intent = new Intent(this,AddPassword.class);
+                intent.putExtra("edit",true);
+                intent.putExtra("id",currentPassword.getId());
+                intent.putExtra("email",currentPassword.getEmail());
+                intent.putExtra("password",currentPassword.getPassword());
+                intent.putExtra("icon",currentPassword.getIcon());
+                intent.putExtra("auto_generate",currentPassword.isAuto_generate());
+                //intent.putExtra("index",passwordListLayout.indexOfChild(passwordLayout));
+                //startActivityForResult(intent,10002);
+                startActivity(intent);
+                overridePendingTransition(R.anim.slide_from_right,R.anim.slide_to_left);
+            });
+
+            //id++;
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     boolean doubleBackToExitPressedOnce = false;

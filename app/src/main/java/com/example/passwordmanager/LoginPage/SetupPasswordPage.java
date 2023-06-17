@@ -66,6 +66,7 @@ public class SetupPasswordPage extends AppCompatActivity {
             if(password.getText().toString().length() > 0 && password.getText().toString().equals(confirmPassword.getText().toString())){
                 if(User.setLoginType(this,LoginType.PASSWORD,password.getText().toString()))
                     startActivity(new Intent(SetupPasswordPage.this, HomePage.class));
+                    overridePendingTransition(R.anim.zoom_in,R.anim.static_animation);
             }
             else
                 wrongPasswordMessage.setText("Passwords might not match or fields are empty");
