@@ -162,6 +162,19 @@ public class HomePage extends AppCompatActivity {
                     startActivity(intent);
                     overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
                 });
+
+                passwordLayout.setOnClickListener(view -> {
+                    Intent intent = new Intent(this, PasswordManagerPage.class);
+                    intent.putExtra("view", true);
+                    intent.putExtra("id", currentPassword.getId());
+                    intent.putExtra("email", currentPassword.getEmail());
+                    intent.putExtra("password", currentPassword.getPassword());
+                    intent.putExtra("icon", currentPassword.getIcon());
+                    intent.putExtra("auto_generate", currentPassword.isAuto_generate());
+                    closeMenu();
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
+                });
             }catch (Exception exception){
                 //in case of an exception, toast and a debug messages are sent
                 Toast.makeText(this, ToastMessage.CANT_LOAD_PASSWORD, Toast.LENGTH_LONG).show();

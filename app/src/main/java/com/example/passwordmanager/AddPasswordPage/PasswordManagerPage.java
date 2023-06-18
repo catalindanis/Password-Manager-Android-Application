@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -55,11 +57,14 @@ public class PasswordManagerPage extends AppCompatActivity {
     String preInstalledIcon = null;
     ImageView deleteButton;
     byte[] inputData = null;
+    ImageView copyEmail;
+    ImageView copyPassword;
+    ImageView passwordIcon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_password);
+        setContentView(R.layout.activity_password_manager);
         RunningActivities.addActivity(this);
 
         initializeValues();
@@ -68,21 +73,19 @@ public class PasswordManagerPage extends AppCompatActivity {
 
         try{
             //if boolean 'edit' was passed, it means that password edit config is needed
-            getIntent().getExtras().getBoolean("edit");
-            initializeEditValues();
-            setupEditListeners();
-        }catch (Exception exception){
-
-        }
+            if(getIntent().getExtras().getBoolean("edit")) {
+                initializeEditValues();
+                setupEditListeners();
+            }
+        }catch (Exception exception){}
 
         try{
-            //if boolean 'view' was passed, it means that password view config is needed
-            getIntent().getExtras().getBoolean("view");
-            initializeViewValues();
-            setupViewListeners();
-        }catch (Exception exception){
-
-        }
+            //if boolean 'view' was passed, it means that password edit config is needed
+            if(getIntent().getExtras().getBoolean("view")) {
+                initializeViewValues();
+                setupViewListeners();
+            }
+        }catch (Exception exception){}
     }
 
     private void setupListeners() {
@@ -314,89 +317,19 @@ public class PasswordManagerPage extends AppCompatActivity {
     }
 
     private void setupViewListeners() {
+
         addButton.setOnClickListener((view) -> {
-
-            //if icon != null means that an image was uploaded from gallery
-            //else if preInstalledIcon != null and preInstalledIcon == Auto => auto generate iocon by first letter of new email
-            //      else if preInstalledIcon != null and preInstalledIcon != Auto => get pre-installed icon
-            //else if autoGenerate > 0 (is true) => auto generate iocon by first letter of new email
-            //else autoGenerate <= 0 (is false) && icon == null && preInstalledIcon == null => no changes to the icon
-            int auto_generate = getIntent().getExtras().getInt("auto_generate");
-            if (icon != null) {
-                //transforming URI image in an input stream, re-transforming it into a byte array
-                try {
-                    InputStream iStream = getContentResolver().openInputStream(icon);
-                    inputData = getBytes(iStream);
-                    auto_generate = 0;
-                } catch (Exception exception) {
-                    //in case of an exception, toast and a debug messages are sent
-                    Toast.makeText(this, ToastMessage.CANT_FORMAT_IMAGE, Toast.LENGTH_LONG).show();
-                    Log.d("DEBUG", "CAN'T FORMAT YOUR IMAGE!");
-                    Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
-                }
-            } else if (preInstalledIcon != null) {
-                //generating auto icon
-                if(preInstalledIcon.equals("Auto")){
-                    icon = User.getAutoIcon(this, email);
-                    auto_generate = 1;
-                    try {
-                        InputStream iStream = getContentResolver().openInputStream(icon);
-                        inputData = getBytes(iStream);
-
-                    } catch (Exception exception) {
-                        //in case of an exception, toast and a debug messages are sent
-                        Toast.makeText(this, ToastMessage.CANT_GENERATE_ICON, Toast.LENGTH_LONG).show();
-                        Log.d("DEBUG", "AUTO GENERATE ICON letter=" + email.getText().toString().charAt(0) + " LEAD TO ERROR!");
-                        Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
-                    }
-                }
-                else {
-                    //getting selected pre-installed icon
-                    icon = User.getPreinstalledIcon(this, preInstalledIcon);
-                    if (icon != null) {
-                        try {
-                            InputStream iStream = getContentResolver().openInputStream(icon);
-                            inputData = getBytes(iStream);
-                            auto_generate = 0;
-                        } catch (Exception exception) {
-                            //in case of an exception, toast and a debug messages are sent
-                            Toast.makeText(this, ToastMessage.CORRUPTED_PRE_INSTALLED_ICON, Toast.LENGTH_LONG).show();
-                            Log.d("DEBUG", "PRE INSTALLED ICON name=" + preInstalledIcon + " MIGHT BE CORRUPTED!");
-                            Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
-                        }
-                    }
-                }
-            } else if(auto_generate > 0) {
-                //generating auto icon
-                icon = User.getAutoIcon(this, email);
-                auto_generate = 1;
-                try {
-                    InputStream iStream = getContentResolver().openInputStream(icon);
-                    inputData = getBytes(iStream);
-
-                } catch (Exception exception) {
-                    //in case of an exception, toast and a debug messages are sent
-                    Toast.makeText(this, ToastMessage.CANT_GENERATE_ICON, Toast.LENGTH_LONG).show();
-                    Log.d("DEBUG", "AUTO GENERATE ICON letter=" + email.getText().toString().charAt(0) + " LEAD TO ERROR!");
-                    Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
-                }
-            }
-
-            //updating the password and finishing all activities
-            //restarting HomePage activity so that the new password will be also loaded
-            User.updatePassword(this, getIntent().getExtras().getInt("id"), new Password(email.getText().toString(),password.getText().toString(),inputData,auto_generate));
-            startActivity(new Intent(PasswordManagerPage.this, HomePage.class));
-            overridePendingTransition(R.anim.slide_from_left,R.anim.slide_to_right);
-            RunningActivities.finishAllActivities();
+            onBackPressed();
         });
 
-        deleteButton.setOnClickListener((view) -> {
-            //removing the password and finishing all activities
-            //restarting HomePage activity so that the new password will be unloaded
-            User.removePassword(this, getIntent().getExtras().getInt("id"));
-            startActivity(new Intent(PasswordManagerPage.this, HomePage.class));
-            overridePendingTransition(R.anim.slide_from_left,R.anim.slide_to_right);
-            RunningActivities.finishAllActivities();
+        copyEmail.setOnClickListener(view -> {
+            setClipboard(this,email.getText().toString());
+            Toast.makeText(this, ToastMessage.COPIED_TO_CLIPBOARD, Toast.LENGTH_SHORT).show();
+        });
+
+        copyPassword.setOnClickListener(view -> {
+            setClipboard(this,password.getText().toString());
+            Toast.makeText(this, ToastMessage.COPIED_TO_CLIPBOARD, Toast.LENGTH_SHORT).show();
         });
     }
 
@@ -413,7 +346,18 @@ public class PasswordManagerPage extends AppCompatActivity {
         standardIconList.setAdapter(ArrayAdapter.createFromResource(this,R.array.iconList_beforeClick, R.layout.spinner_item));
         selectedFile = (TextView) findViewById(R.id.selectedFile);
         deleteButton = findViewById(R.id.deleteButton);
+        copyEmail = findViewById(R.id.copyEmail);
+        copyPassword = findViewById(R.id.copyPassword);
+        passwordIcon = findViewById(R.id.passwordIcon);
         deleteButton.setVisibility(View.INVISIBLE);
+        copyEmail.setVisibility(View.INVISIBLE);
+        copyPassword.setVisibility(View.INVISIBLE);
+        passwordIcon.setVisibility(View.INVISIBLE);
+
+        uploadIconButtonIcon.setVisibility(View.INVISIBLE);
+        selectedFile.setVisibility(View.INVISIBLE);
+        findViewById(R.id.textView14).setVisibility(View.INVISIBLE);
+        findViewById(R.id.textView15).setVisibility(View.INVISIBLE);
     }
 
     private void initializeEditValues() {
@@ -425,17 +369,57 @@ public class PasswordManagerPage extends AppCompatActivity {
         email.setText(bundle.getString("email"));
         password.setText(bundle.getString("password"));
         inputData = bundle.getByteArray("icon");
+
+        copyEmail.setVisibility(View.INVISIBLE);
+        copyPassword.setVisibility(View.INVISIBLE);
     }
 
     private void initializeViewValues() {
         Bundle bundle = getIntent().getExtras();
+        addButton.setText("BACK");
 
-        deleteButton.setVisibility(View.VISIBLE);
-        addButton.setText("SAVE");
+        copyEmail.setVisibility(View.VISIBLE);
+        copyPassword.setVisibility(View.VISIBLE);
+        passwordIcon.setVisibility(View.VISIBLE);
 
         email.setText(bundle.getString("email"));
         password.setText(bundle.getString("password"));
         inputData = bundle.getByteArray("icon");
+
+        email.setEnabled(false);
+        password.setEnabled(false);
+
+        uploadIconButtonIcon.setVisibility(View.INVISIBLE);
+        wrongFieldsMessage.setVisibility(View.INVISIBLE);
+        spinnerArrow.setVisibility(View.INVISIBLE);
+        standardIconList.setVisibility(View.INVISIBLE);
+        selectedFile.setVisibility(View.INVISIBLE);
+        findViewById(R.id.textView14).setVisibility(View.INVISIBLE);
+        findViewById(R.id.textView15).setVisibility(View.INVISIBLE);
+
+        email.animate().translationY(200f).setDuration(0);
+        password.animate().translationY(200f).setDuration(0);
+        findViewById(R.id.textView3).animate().translationY(200f).setDuration(0);
+        findViewById(R.id.textView4).animate().translationY(200f).setDuration(0);
+        copyEmail.animate().translationY(200f).setDuration(0);
+        copyPassword.animate().translationY(200f).setDuration(0);
+        showPassword.animate().translationY(200f).setDuration(0);
+        addButton.animate().translationY(-200f).setDuration(0);
+        passwordIcon.animate().translationY(100f).setDuration(0);
+
+        Bitmap bmp = BitmapFactory.decodeByteArray(inputData, 0, inputData.length);
+        passwordIcon.setImageBitmap(bmp);
+    }
+
+    private void setClipboard(Context context, String text) {
+        if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
+            android.text.ClipboardManager clipboard = (android.text.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+            clipboard.setText(text);
+        } else {
+            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+            android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", text);
+            clipboard.setPrimaryClip(clip);
+        }
     }
 
     public byte[] getBytes(InputStream inputStream) throws IOException {
@@ -467,6 +451,8 @@ public class PasswordManagerPage extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        startActivity(new Intent(PasswordManagerPage.this, HomePage.class));
         overridePendingTransition(R.anim.slide_from_left,R.anim.slide_to_right);
+        RunningActivities.finishAllActivities();
     }
 }
