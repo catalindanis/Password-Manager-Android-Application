@@ -31,7 +31,6 @@ import com.example.passwordmanager.Config.RunningActivities;
 import com.example.passwordmanager.Config.ToastMessage;
 import com.example.passwordmanager.HomePage.HomePage;
 import com.example.passwordmanager.Password.Password;
-import com.example.passwordmanager.Password.PasswordList;
 import com.example.passwordmanager.R;
 import com.example.passwordmanager.User.User;
 
@@ -39,7 +38,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class AddPassword extends AppCompatActivity {
+public class PasswordManagerPage extends AppCompatActivity {
 
     RelativeLayout uploadIconButton;
     ImageButton uploadIconButtonIcon;
@@ -72,6 +71,15 @@ public class AddPassword extends AppCompatActivity {
             getIntent().getExtras().getBoolean("edit");
             initializeEditValues();
             setupEditListeners();
+        }catch (Exception exception){
+
+        }
+
+        try{
+            //if boolean 'view' was passed, it means that password view config is needed
+            getIntent().getExtras().getBoolean("view");
+            initializeViewValues();
+            setupViewListeners();
         }catch (Exception exception){
 
         }
@@ -117,13 +125,16 @@ public class AddPassword extends AppCompatActivity {
                 return;
             }
 
+            //if icon != null means that an image was uploaded from gallery
+            //else if preInstalledIcon != null and preInstalledIcon == Auto => auto generate iocon by first letter of email
+            //      else if preInstalledIcon != null and preInstalledIcon != Auto => get pre-installed icon
+            //else (icon == null && preInstalledIcon == null) => auto generate iocon by first letter of email
             int auto_generate = 0;
-            //transforming URI image in an input stream, re-transforming it into a byte array
             if(icon != null) {
+                //transforming URI image in an input stream, re-transforming it into a byte array
                 try {
                     InputStream iStream = getContentResolver().openInputStream(icon);
                     inputData = getBytes(iStream);
-
                 } catch (Exception exception) {
                     //in case of an exception, toast and a debug messages are sent
                     Toast.makeText(this, ToastMessage.CANT_FORMAT_IMAGE, Toast.LENGTH_LONG).show();
@@ -139,11 +150,10 @@ public class AddPassword extends AppCompatActivity {
                     try {
                         InputStream iStream = getContentResolver().openInputStream(icon);
                         inputData = getBytes(iStream);
-
                     } catch (Exception exception) {
                         //in case of an exception, toast and a debug messages are sent
                         Toast.makeText(this, ToastMessage.CANT_GENERATE_ICON, Toast.LENGTH_LONG).show();
-                        Log.d("DEBUG", "AUTO GENERATE ICON letter=" + email.getText().toString().charAt(0) + "LEAD TO ERROR!");
+                        Log.d("DEBUG", "AUTO GENERATE ICON letter=" + email.getText().toString().charAt(0) + " LEAD TO ERROR!");
                         Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
                     }
                 }
@@ -158,7 +168,7 @@ public class AddPassword extends AppCompatActivity {
                                 } catch (Exception exception) {
                                     //in case of an exception, toast and a debug messages are sent
                                     Toast.makeText(this, ToastMessage.CORRUPTED_PRE_INSTALLED_ICON, Toast.LENGTH_LONG).show();
-                                    Log.d("DEBUG", "PRE INSTALLED ICON name=" + preInstalledIcon + "MIGHT BE CORRUPTED!");
+                                    Log.d("DEBUG", "PRE INSTALLED ICON name=" + preInstalledIcon + " MIGHT BE CORRUPTED!");
                                     Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
                                 }
                             }
@@ -168,7 +178,6 @@ public class AddPassword extends AppCompatActivity {
                     //generating auto icon
                     auto_generate = 1;
                     icon = User.getAutoIcon(this,email);
-
                     try {
                         InputStream iStream = getContentResolver().openInputStream(icon);
                         inputData = getBytes(iStream);
@@ -176,15 +185,15 @@ public class AddPassword extends AppCompatActivity {
                     } catch (Exception exception) {
                         //in case of an exception, toast and a debug messages are sent
                         Toast.makeText(this, ToastMessage.CORRUPTED_PRE_INSTALLED_ICON, Toast.LENGTH_LONG).show();
-                        Log.d("DEBUG", "PRE INSTALLED ICON name=" + preInstalledIcon + "MIGHT BE CORRUPTED!");
+                        Log.d("DEBUG", "PRE INSTALLED ICON name=" + preInstalledIcon + " MIGHT BE CORRUPTED!");
                         Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
                     }
                 }
 
-            //adding the password in database and finishing all activities
+            //adding the password and finishing all activities
             //restarting HomePage activity so that the new password will be also loaded
             User.addPassword(this,new Password(email.getText().toString(),password.getText().toString(),inputData,auto_generate));
-            startActivity(new Intent(AddPassword.this, HomePage.class));
+            startActivity(new Intent(PasswordManagerPage.this, HomePage.class));
             overridePendingTransition(R.anim.slide_from_left,R.anim.slide_to_right);
             RunningActivities.finishAllActivities();
         });
@@ -220,19 +229,26 @@ public class AddPassword extends AppCompatActivity {
     private void setupEditListeners() {
         addButton.setOnClickListener((view) -> {
 
+            //if icon != null means that an image was uploaded from gallery
+            //else if preInstalledIcon != null and preInstalledIcon == Auto => auto generate iocon by first letter of new email
+            //      else if preInstalledIcon != null and preInstalledIcon != Auto => get pre-installed icon
+            //else if autoGenerate > 0 (is true) => auto generate iocon by first letter of new email
+            //else autoGenerate <= 0 (is false) && icon == null && preInstalledIcon == null => no changes to the icon
             int auto_generate = getIntent().getExtras().getInt("auto_generate");
             if (icon != null) {
+                //transforming URI image in an input stream, re-transforming it into a byte array
                 try {
                     InputStream iStream = getContentResolver().openInputStream(icon);
                     inputData = getBytes(iStream);
                     auto_generate = 0;
                 } catch (Exception exception) {
-                    Toast.makeText(this, ToastMessage.BAD_IMAGE, Toast.LENGTH_SHORT).show();
-                    //Log.d("COMMENT", "CAN'T TRANSFORM IMAGE IN BYTE ARRAY!");
-                    //Log.d("COMMENT",exception.getMessage());
+                    //in case of an exception, toast and a debug messages are sent
+                    Toast.makeText(this, ToastMessage.CANT_FORMAT_IMAGE, Toast.LENGTH_LONG).show();
+                    Log.d("DEBUG", "CAN'T FORMAT YOUR IMAGE!");
+                    Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
                 }
             } else if (preInstalledIcon != null) {
-
+                //generating auto icon
                 if(preInstalledIcon.equals("Auto")){
                     icon = User.getAutoIcon(this, email);
                     auto_generate = 1;
@@ -241,12 +257,14 @@ public class AddPassword extends AppCompatActivity {
                         inputData = getBytes(iStream);
 
                     } catch (Exception exception) {
-                        Toast.makeText(this, ToastMessage.BAD_IMAGE, Toast.LENGTH_SHORT).show();
-                        //Log.d("COMMENT", "AUTOGENERATED ICONS MIGHT HAVE BEEN CORUPTED!");
-                        //Log.d("COMMENT",exception.getMessage());
+                        //in case of an exception, toast and a debug messages are sent
+                        Toast.makeText(this, ToastMessage.CANT_GENERATE_ICON, Toast.LENGTH_LONG).show();
+                        Log.d("DEBUG", "AUTO GENERATE ICON letter=" + email.getText().toString().charAt(0) + " LEAD TO ERROR!");
+                        Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
                     }
                 }
                 else {
+                    //getting selected pre-installed icon
                     icon = User.getPreinstalledIcon(this, preInstalledIcon);
                     if (icon != null) {
                         try {
@@ -254,13 +272,15 @@ public class AddPassword extends AppCompatActivity {
                             inputData = getBytes(iStream);
                             auto_generate = 0;
                         } catch (Exception exception) {
-                            Toast.makeText(this, ToastMessage.BAD_IMAGE, Toast.LENGTH_SHORT).show();
-                            //Log.d("COMMENT", "PREINSTALLED ICONS MIGHT HAVE BEEN CORUPTED!");
-                            //Log.d("COMMENT",exception.getMessage());
+                            //in case of an exception, toast and a debug messages are sent
+                            Toast.makeText(this, ToastMessage.CORRUPTED_PRE_INSTALLED_ICON, Toast.LENGTH_LONG).show();
+                            Log.d("DEBUG", "PRE INSTALLED ICON name=" + preInstalledIcon + " MIGHT BE CORRUPTED!");
+                            Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
                         }
                     }
                 }
             } else if(auto_generate > 0) {
+                //generating auto icon
                 icon = User.getAutoIcon(this, email);
                 auto_generate = 1;
                 try {
@@ -268,21 +288,113 @@ public class AddPassword extends AppCompatActivity {
                     inputData = getBytes(iStream);
 
                 } catch (Exception exception) {
-                    Toast.makeText(this, ToastMessage.BAD_IMAGE, Toast.LENGTH_SHORT).show();
-                    //Log.d("COMMENT", "AUTOGENERATED ICONS MIGHT HAVE BEEN CORUPTED!");
-                    //Log.d("COMMENT",exception.getMessage());
+                    //in case of an exception, toast and a debug messages are sent
+                    Toast.makeText(this, ToastMessage.CANT_GENERATE_ICON, Toast.LENGTH_LONG).show();
+                    Log.d("DEBUG", "AUTO GENERATE ICON letter=" + email.getText().toString().charAt(0) + " LEAD TO ERROR!");
+                    Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
                 }
             }
 
+            //updating the password and finishing all activities
+            //restarting HomePage activity so that the new password will be also loaded
             User.updatePassword(this, getIntent().getExtras().getInt("id"), new Password(email.getText().toString(),password.getText().toString(),inputData,auto_generate));
-            startActivity(new Intent(AddPassword.this, HomePage.class));
+            startActivity(new Intent(PasswordManagerPage.this, HomePage.class));
             overridePendingTransition(R.anim.slide_from_left,R.anim.slide_to_right);
             RunningActivities.finishAllActivities();
         });
 
         deleteButton.setOnClickListener((view) -> {
+            //removing the password and finishing all activities
+            //restarting HomePage activity so that the new password will be unloaded
             User.removePassword(this, getIntent().getExtras().getInt("id"));
-            startActivity(new Intent(AddPassword.this, HomePage.class));
+            startActivity(new Intent(PasswordManagerPage.this, HomePage.class));
+            overridePendingTransition(R.anim.slide_from_left,R.anim.slide_to_right);
+            RunningActivities.finishAllActivities();
+        });
+    }
+
+    private void setupViewListeners() {
+        addButton.setOnClickListener((view) -> {
+
+            //if icon != null means that an image was uploaded from gallery
+            //else if preInstalledIcon != null and preInstalledIcon == Auto => auto generate iocon by first letter of new email
+            //      else if preInstalledIcon != null and preInstalledIcon != Auto => get pre-installed icon
+            //else if autoGenerate > 0 (is true) => auto generate iocon by first letter of new email
+            //else autoGenerate <= 0 (is false) && icon == null && preInstalledIcon == null => no changes to the icon
+            int auto_generate = getIntent().getExtras().getInt("auto_generate");
+            if (icon != null) {
+                //transforming URI image in an input stream, re-transforming it into a byte array
+                try {
+                    InputStream iStream = getContentResolver().openInputStream(icon);
+                    inputData = getBytes(iStream);
+                    auto_generate = 0;
+                } catch (Exception exception) {
+                    //in case of an exception, toast and a debug messages are sent
+                    Toast.makeText(this, ToastMessage.CANT_FORMAT_IMAGE, Toast.LENGTH_LONG).show();
+                    Log.d("DEBUG", "CAN'T FORMAT YOUR IMAGE!");
+                    Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
+                }
+            } else if (preInstalledIcon != null) {
+                //generating auto icon
+                if(preInstalledIcon.equals("Auto")){
+                    icon = User.getAutoIcon(this, email);
+                    auto_generate = 1;
+                    try {
+                        InputStream iStream = getContentResolver().openInputStream(icon);
+                        inputData = getBytes(iStream);
+
+                    } catch (Exception exception) {
+                        //in case of an exception, toast and a debug messages are sent
+                        Toast.makeText(this, ToastMessage.CANT_GENERATE_ICON, Toast.LENGTH_LONG).show();
+                        Log.d("DEBUG", "AUTO GENERATE ICON letter=" + email.getText().toString().charAt(0) + " LEAD TO ERROR!");
+                        Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
+                    }
+                }
+                else {
+                    //getting selected pre-installed icon
+                    icon = User.getPreinstalledIcon(this, preInstalledIcon);
+                    if (icon != null) {
+                        try {
+                            InputStream iStream = getContentResolver().openInputStream(icon);
+                            inputData = getBytes(iStream);
+                            auto_generate = 0;
+                        } catch (Exception exception) {
+                            //in case of an exception, toast and a debug messages are sent
+                            Toast.makeText(this, ToastMessage.CORRUPTED_PRE_INSTALLED_ICON, Toast.LENGTH_LONG).show();
+                            Log.d("DEBUG", "PRE INSTALLED ICON name=" + preInstalledIcon + " MIGHT BE CORRUPTED!");
+                            Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
+                        }
+                    }
+                }
+            } else if(auto_generate > 0) {
+                //generating auto icon
+                icon = User.getAutoIcon(this, email);
+                auto_generate = 1;
+                try {
+                    InputStream iStream = getContentResolver().openInputStream(icon);
+                    inputData = getBytes(iStream);
+
+                } catch (Exception exception) {
+                    //in case of an exception, toast and a debug messages are sent
+                    Toast.makeText(this, ToastMessage.CANT_GENERATE_ICON, Toast.LENGTH_LONG).show();
+                    Log.d("DEBUG", "AUTO GENERATE ICON letter=" + email.getText().toString().charAt(0) + " LEAD TO ERROR!");
+                    Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
+                }
+            }
+
+            //updating the password and finishing all activities
+            //restarting HomePage activity so that the new password will be also loaded
+            User.updatePassword(this, getIntent().getExtras().getInt("id"), new Password(email.getText().toString(),password.getText().toString(),inputData,auto_generate));
+            startActivity(new Intent(PasswordManagerPage.this, HomePage.class));
+            overridePendingTransition(R.anim.slide_from_left,R.anim.slide_to_right);
+            RunningActivities.finishAllActivities();
+        });
+
+        deleteButton.setOnClickListener((view) -> {
+            //removing the password and finishing all activities
+            //restarting HomePage activity so that the new password will be unloaded
+            User.removePassword(this, getIntent().getExtras().getInt("id"));
+            startActivity(new Intent(PasswordManagerPage.this, HomePage.class));
             overridePendingTransition(R.anim.slide_from_left,R.anim.slide_to_right);
             RunningActivities.finishAllActivities();
         });
@@ -315,6 +427,17 @@ public class AddPassword extends AppCompatActivity {
         inputData = bundle.getByteArray("icon");
     }
 
+    private void initializeViewValues() {
+        Bundle bundle = getIntent().getExtras();
+
+        deleteButton.setVisibility(View.VISIBLE);
+        addButton.setText("SAVE");
+
+        email.setText(bundle.getString("email"));
+        password.setText(bundle.getString("password"));
+        inputData = bundle.getByteArray("icon");
+    }
+
     public byte[] getBytes(InputStream inputStream) throws IOException {
         //transforming the inputStream image in a byte array
         ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
@@ -331,7 +454,6 @@ public class AddPassword extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         //storing the image from the gallery in variable icon
         if(resultCode == RESULT_OK){
             if(requestCode == 1000){

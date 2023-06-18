@@ -31,6 +31,8 @@ public class LoadingScreen extends AppCompatActivity{
 
         RunningActivities.addActivity(this);
 
+        //User.removeLoginType(this);
+
         //starting desired class after loading processes are finished
         Handler handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(new Runnable() {
@@ -47,12 +49,9 @@ public class LoadingScreen extends AppCompatActivity{
             }
         }, 1000);
 
-        //check if is the first time user enters the application
-        //if it is true, then the user must setup a login method, so checking login type is no longer needed
-        if(!User.isFirstTime(this)){
-            if(User.getLoginType(this) != LoginType.NULL)
-                cls = LoginPage.class;
-        }
+        if(User.getLoginType(this) != LoginType.NULL)
+            cls = LoginPage.class;
+        else User.removePasswords(this);
 
         new Thread(new Runnable() {
             @Override

@@ -22,7 +22,7 @@
             android:name=".AboutPage.About"
             android:exported="false" />
         <activity
-            android:name=".AddPasswordPage.AddPassword"
+            android:name=".AddPasswordPage.PasswordManagerPage"
             android:exported="false" />
         <activity
             android:name=".LoginPage.SetupLoginPage"

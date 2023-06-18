@@ -22,19 +22,26 @@ public class PasswordList extends ArrayList<Password> {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    Passwords_Database db = new Passwords_Database(context);
-                    SQLiteDatabase database = db.getWritableDatabase();
+                    try {
+                        Passwords_Database db = new Passwords_Database(context);
+                        SQLiteDatabase database = db.getWritableDatabase();
 
-                    ContentValues cv = new ContentValues();
-                    cv.put("id",password.getId());
-                    cv.put("email", password.getEmail());
-                    cv.put("password", User.encryptData(password.getPassword()));
-                    cv.put("icon", password.getIcon());
-                    cv.put("auto_generate", password.isAuto_generate());
+                        ContentValues cv = new ContentValues();
+                        cv.put("id", password.getId());
+                        cv.put("email", password.getEmail());
+                        cv.put("password", User.encryptData(password.getPassword()));
+                        cv.put("icon", password.getIcon());
+                        cv.put("auto_generate", password.isAuto_generate());
 
-                    database.insert(PASSWORDS_TABLE, null, cv);
+                        database.insert(PASSWORDS_TABLE, null, cv);
 
-                    Log.d("DEBUG", "PASSWORD ID=" + password.getId() + " ADDED SUCCESSFULLY!");
+                        Log.d("DEBUG", "PASSWORD ID=" + password.getId() + " ADDED SUCCESSFULLY!");
+                    }catch (Exception exception){
+                        //in case of an exception, toast and a debug messages are sent
+                        Toast.makeText(context, ToastMessage.CANT_ADD_PASSWORD, Toast.LENGTH_LONG).show();
+                        Log.d("DEBUG", "ADD PASSWORD ID=" + password.getId() + " LEAD TO ERROR!");
+                        Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
+                    }
                 }
 
             }).start();
@@ -64,7 +71,6 @@ public class PasswordList extends ArrayList<Password> {
                     String password = cursor.getString(2);
                     byte[] icon = cursor.getBlob(3);
                     int auto_generate = cursor.getInt(4);
-                    Log.d("DEBUG",Integer.toString(auto_generate));
 
                     this.add(new Password(id, email, User.decryptData(password), icon, auto_generate));
 
@@ -164,17 +170,24 @@ public class PasswordList extends ArrayList<Password> {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    Passwords_Database db = new Passwords_Database(context);
-                    SQLiteDatabase database = db.getWritableDatabase();
+                    try {
+                        Passwords_Database db = new Passwords_Database(context);
+                        SQLiteDatabase database = db.getWritableDatabase();
 
-                    ContentValues cv = new ContentValues();
-                    cv.put("id", password.getId());
-                    cv.put("email", password.getEmail());
-                    cv.put("password", User.encryptData(password.getPassword()));
-                    cv.put("icon", password.getIcon());
-                    cv.put("auto_generate", password.isAuto_generate());
+                        ContentValues cv = new ContentValues();
+                        cv.put("id", password.getId());
+                        cv.put("email", password.getEmail());
+                        cv.put("password", User.encryptData(password.getPassword()));
+                        cv.put("icon", password.getIcon());
+                        cv.put("auto_generate", password.isAuto_generate());
 
-                    database.update(PASSWORDS_TABLE, cv, "id = ?", new String[]{Integer.toString(id)});
+                        database.update(PASSWORDS_TABLE, cv, "id = ?", new String[]{Integer.toString(id)});
+                    }catch (Exception exception){
+                        //in case of an exception, toast and a debug messages are sent
+                        Toast.makeText(context, ToastMessage.CANT_UPDATE_PASSWORD, Toast.LENGTH_LONG).show();
+                        Log.d("DEBUG","UPDATING PASSWORD ID=" + id + " LEAD TO ERROR!");
+                        Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
+                    }
                 }
             }).start();
         } catch (Exception exception) {

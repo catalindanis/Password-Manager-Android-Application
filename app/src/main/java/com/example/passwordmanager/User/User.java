@@ -48,13 +48,9 @@ public class User {
     private static final String FIRST_TIME_TABLE = "first_time";
     private static final String LOGIN_PASSWORD_TABLE = "login_password";
     private static int[] autoGenIcons = new int[100];
-    public static void addPassword(Context context, Password password){
-        passwordList.save(password,context);
-    }
+    public static void addPassword(Context context, Password password){ passwordList.save(password,context); }
 
-    public static void updatePassword(Context context, int id, Password password){
-        passwordList.update(context, id, password);
-    }
+    public static void updatePassword(Context context, int id, Password password){ passwordList.update(context, id, password); }
 
     public static PasswordList getPasswords(){
         return passwordList;
@@ -69,6 +65,8 @@ public class User {
     }
 
     public static int generateId(){
+        //generating random numbers and verifying not to be one
+        //of the other passwords id
         boolean found = false;
         Random random = new Random();
         int id = -1;
@@ -85,36 +83,36 @@ public class User {
         return id;
     }
 
-    //setLoginType for BIOMETRICS (no password needed)
     public static boolean setLoginType(Context context,LoginType type){
+        //setLoginType for BIOMETRICS (no password needed)
         if(type == LoginType.NULL || type == LoginType.PASSWORD)
             return false;
         try {
-            //loginType = type;
             User_Database db = new User_Database(context);
             SQLiteDatabase database = db.getWritableDatabase();
+
+            ContentValues login_type_value = new ContentValues();
+            login_type_value.put("login_type", type.name());
 
             //removing the current loginType (just to be sure that the table
             //has no more than 1 element) and inserting the login type value
             //in it's database table
             removeLoginType(context);
-            ContentValues cv = new ContentValues();
-            cv.put("login_type", type.name());
-            database.insert(LOGIN_TYPE_TABLE, null, cv);
+            database.insert(LOGIN_TYPE_TABLE, null, login_type_value);
 
-            //Log.d("COMMENT","SETTED UP USER LOGIN TYPE TO " + type.name());
+            Log.d("DEBUG","SET USER LOGIN TYPE TO " + type.name() + " SUCCESSFULLY!");
             return true;
         }catch (Exception exception){
-            //in case of an exception, a toast message is thrown, and action is cancelled
-            Toast.makeText(context, ToastMessage.CORRUPTED_FILES, Toast.LENGTH_SHORT).show();
-            //Log.d("COMMENT","SET USER LOGIN TYPE LEAD TO ERROR!");
-            //Log.d("COMMENT",exception.getMessage());
+            //in case of an exception, toast and a debug messages are sent
+            Toast.makeText(context, ToastMessage.SETUP_LOGIN_TYPE_ERROR, Toast.LENGTH_LONG).show();
+            Log.d("DEBUG", "SET USER LOGIN TYPE TO " + type.name() + " LEAD TO ERROR!");
+            Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
             return false;
         }
     }
 
-    //setLoginType for PASSWORD (password needed)
     public static boolean setLoginType(Context context,LoginType type, String password){
+        //setLoginType for PASSWORD (password needed)
         if(type == LoginType.NULL || type == LoginType.BIOMETRICS)
             return false;
         try {
@@ -129,44 +127,30 @@ public class User {
             //in it's database table
             removeLoginType(context);
             database.insert(LOGIN_TYPE_TABLE, null, login_type_value);
-            //Log.d("COMMENT","SETTED UP USER LOGIN TYPE TO " + type.name());
-
-            //encrypting password using MD5 (Message Digest) algorithm
-            String encryptedpassword = new String();
-            MessageDigest m = MessageDigest.getInstance("MD5");
-            m.update(password.getBytes());
-            byte[] bytes = m.digest();
-            StringBuilder s = new StringBuilder();
-            for(int i=0; i< bytes.length ;i++)
-            {
-                s.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
-            }
-            encryptedpassword = s.toString();
 
             ContentValues password_value = new ContentValues();
-            password_value.put("password",encryptedpassword);
+            //encrypting login password
+            password_value.put("password",encryptData(password));
 
             //removing the current loginPassword (just to be sure that the table
             //has no more than 1 element) and inserting the login password encrypted
             //value in it's database table
             removeLoginPassword(context);
             database.insert(LOGIN_PASSWORD_TABLE,null,password_value);
-            //Log.d("COMMENT","SETTED UP USER LOGIN PASSWORD");
+
+            Log.d("DEBUG","SET USER LOGIN TYPE TO " + type.name() + " SUCCESSFULLY!");
             return true;
         }catch (Exception exception){
-            //in case of an exception, a toast message is thrown, and action is cancelled
-            Toast.makeText(context, ToastMessage.CORRUPTED_FILES, Toast.LENGTH_SHORT).show();
-            //Log.d("COMMENT","SET USER LOGIN TYPE OR LOGIN PASSWORD LEAD TO ERROR!");
-            //Log.d("COMMENT",exception.getMessage());
+            //in case of an exception, toast and a debug messages are sent
+            Toast.makeText(context, ToastMessage.SETUP_LOGIN_TYPE_ERROR, Toast.LENGTH_LONG).show();
+            Log.d("DEBUG", "SET USER LOGIN TYPE TO " + type.name() + " LEAD TO ERROR!");
+            Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
             return false;
         }
     }
 
     public static LoginType getLoginType(Context context){
-        //checks if loginType is null. if it is null, then the value
-        //is taken from the database and the loginType variable is changed and returned
-        //if it isn't null, then we can directly return it, because it was
-        //already readed from the database
+        //the value loginType is taken from the database
         try {
             User_Database db = new User_Database(context);
             SQLiteDatabase database = db.getReadableDatabase();
@@ -183,18 +167,18 @@ public class User {
             cursor.close();
             database.close();
 
-            //Log.d("COMMENT","CURRENT USER LOGIN TYPE IS " + LoginType.fromString(value));
+            Log.d("DEBUG","CURRENT USER LOGIN TYPE IS " + LoginType.fromString(value));
             return LoginType.fromString(value);
         } catch (Exception exception) {
-            //in case of an exception, a toast message is thrown, and LoginType.NULL is returned
-            Toast.makeText(context, ToastMessage.CORRUPTED_FILES, Toast.LENGTH_SHORT).show();
-            //Log.d("COMMENT","GET USER LOGIN TYPE LEAD TO ERROR!");
-            //Log.d("COMMENT",exception.getMessage());
+            //in case of an exception, toast and a debug messages are sent
+            Toast.makeText(context, ToastMessage.GET_LOGIN_TYPE_ERROR, Toast.LENGTH_LONG).show();
+            Log.d("DEBUG", "GET USER LOGIN TYPE LEAD TO ERROR!");
+            Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
             return LoginType.NULL;
         }
     }
 
-    public static boolean removeLoginType(Context context){
+    public static boolean removeLoginType(Context context) {
         //used before updating the loginType.
         //drops and recreates the desired table for the loginType
         try {
@@ -206,15 +190,15 @@ public class User {
 
             statement = "CREATE TABLE " + LOGIN_TYPE_TABLE + "(login_type varchar(255))";
             database.execSQL(statement);
-            //Log.d("COMMENT","REMOVED USER LOGIN TYPE");
+            Log.d("DEBUG", "REMOVED USER LOGIN TYPE SUCCESSFULLY!");
             return true;
-        }catch (Exception exception){
-            //in case of an exception, a toast message is thrown, and action is cancelled
-            Toast.makeText(context, ToastMessage.CORRUPTED_FILES, Toast.LENGTH_SHORT).show();
-            //Log.d("COMMENT","REMOVE USER LOGIN TYPE LEAD TO ERROR!");
-            //Log.d("COMMENT",exception.getMessage());
+        } catch (Exception exception) {
+            //in case of an exception, toast and a debug messages are sent
+            Toast.makeText(context, ToastMessage.REMOVE_LOGIN_TYPE_ERROR, Toast.LENGTH_LONG).show();
+            Log.d("DEBUG", "REMOVE USER LOGIN TYPE LEAD TO ERROR!");
+            Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
+            return false;
         }
-        return false;
     }
 
     public static boolean removeLoginPassword(Context context){
@@ -229,48 +213,36 @@ public class User {
 
             statement = "CREATE TABLE " + LOGIN_PASSWORD_TABLE + "(password varchar(255))";
             database.execSQL(statement);
-            //Log.d("COMMENT","REMOVED USER LOGIN PASSWORD");
+            Log.d("DEBUG","REMOVED USER LOGIN PASSWORD SUCCESSFULLY!");
             return true;
         }catch (Exception exception){
-            //in case of an exception, a toast message is thrown, and action is cancelled
-            Toast.makeText(context, ToastMessage.CORRUPTED_FILES, Toast.LENGTH_SHORT).show();
-            //Log.d("COMMENT","REMOVE USER LOGIN PASSWORD LEAD TO ERROR!");
-            //Log.d("COMMENT",exception.getMessage());
+            //in case of an exception, toast and a debug messages are sent
+            Toast.makeText(context, ToastMessage.REMOVE_LOGIN_PASSWORD_ERROR, Toast.LENGTH_LONG).show();
+            Log.d("DEBUG", "REMOVE USER LOGIN PASSWORD LEAD TO ERROR!");
+            Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
+            return false;
         }
-        return false;
     }
 
     public static boolean verifyLoginPassword(Context context,String enteredPassword) {
-        //encrypting entered password
-        String encryptedpassword = new String();
-        try {
-            MessageDigest m = MessageDigest.getInstance("MD5");
-            m.update(enteredPassword.getBytes());
-            byte[] bytes = m.digest();
-            StringBuilder s = new StringBuilder();
-            for (int i = 0; i < bytes.length; i++) {
-                s.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
-            }
-            encryptedpassword = s.toString();
-        }catch (NoSuchAlgorithmException noSuchAlgorithmException){
-            //in case of an exception false is returned
-            //Log.d("COMMENT","ENCRYPTING USER ENTERED PASSWORD LEAD TO ERROR!");
-            //Log.d("COMMENT",noSuchAlgorithmException.getMessage());
-            return false;
-        }
+        try{
+            //decrypting password from database
+            String decryptedPassword = decryptData(getLoginPassword(context));
 
-        //verifying the encrypted login password from the database with the one entered by the user
-        try {
-            if (getLoginPassword(context).equals(encryptedpassword)) {
-                //Log.d("COMMENT", "LOGIN BY PASSWORD SUCCESFULLY");
+            if (decryptedPassword.equals(enteredPassword)) {
+                Log.d("DEBUG", "USER LOGIN PASSWORD IS CORRECT!");
                 return true;
             }
-            //Log.d("COMMENT", "PASSWORDS NOT MATCH");
-        }catch (NullPointerException nullPointerException){
-            //Log.d("COMMENT","ENCRYPTED PASSWORD FROM THE DATABASE IS NULL!");
-            //Log.d("COMMENT",nullPointerException.getMessage());
+
+            Log.d("DEBUG", "USER LOGIN PASSWORD IS INCORRECT!");
+            return false;
+        }catch (Exception exception){
+            //in case of an exception, toast and a debug messages are sent
+            Toast.makeText(context, ToastMessage.VERIFY_LOGIN_PASSWORD_ERROR, Toast.LENGTH_LONG).show();
+            Log.d("DEBUG", "VERIFY USER LOGIN PASSWORD LEAD TO ERROR!");
+            Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
+            return false;
         }
-        return false;
     }
 
     private static String getLoginPassword(Context context) {
@@ -290,102 +262,45 @@ public class User {
             cursor.close();
             database.close();
 
-            //Log.d("COMMENT","RETURNED USER LOGIN PASSWORD SUCCESFULLY ");
+            Log.d("DEBUG","GET USER LOGIN PASSWORD SUCCESSFULLY!");
             return password;
         }catch (Exception exception){
-            //in case of an exception, a toast message is thrown, and null is returned
-            Toast.makeText(context, ToastMessage.CORRUPTED_FILES, Toast.LENGTH_SHORT).show();
-            //Log.d("COMMENT","GET USER LOGIN PASSWORD LEAD TO ERROR!");
-            //Log.d("COMMENT",exception.getMessage());
-        }
-
-        return null;
-    }
-
-    public static boolean isFirstTime(Context context){
-        try {
-            //read the value from it's database table
-            //returns true if the user has never setted up a loginType
-            //isFirstTime will return false only aftter setting a login method,
-            //after first HomePage onCreate
-            boolean value = true;
-            User_Database db = new User_Database(context);
-            SQLiteDatabase database = db.getReadableDatabase();
-
-            String statement = "SELECT first_time FROM " + FIRST_TIME_TABLE;
-            Cursor cursor = database.rawQuery(statement, null);
-
-            if (cursor.moveToFirst()) {
-                value = cursor.getInt(0) == 1 ? true : false;
-            }
-
-            cursor.close();
-            database.close();
-
-            //if(value)
-                //Log.d("COMMENT","CURRENT USER FIRST TIME IS " + (value ? "TRUE" : "FALSE"));
-
-            return value;
-        }catch (Exception exception){
-            //in case of an exception, a toast message is thrown, and the value true is returned
-            Toast.makeText(context, ToastMessage.CORRUPTED_FILES, Toast.LENGTH_SHORT).show();
-            //Log.d("COMMENT","GET USER FIRST TIME LEAD TO ERROR!");
-            //Log.d("COMMENT",exception.getMessage());
-        }
-        return true;
-    }
-
-    public static void setFirstTime(Context context, boolean firstTime){
-        //updates the user isFirstTime variable directly in the database
-        try {
-            User_Database db = new User_Database(context);
-            SQLiteDatabase database = db.getWritableDatabase();
-
-            ContentValues cv = new ContentValues();
-            cv.put("first_time", firstTime ? 1 : 0);
-            database.insert(FIRST_TIME_TABLE, null, cv);
-            //Log.d("COMMENT","CHANGED USER FIRST TIME TO " + (firstTime ? "TRUE" : "FALSE"));
-        }catch (Exception exception){
-            //in case of an exception, a toast message is thrown, and the action is cancelled
-            Toast.makeText(context, ToastMessage.CORRUPTED_FILES, Toast.LENGTH_SHORT).show();
-            //Log.d("COMMENT","CHANGED USER FIRST TIME LEAD TO ERROR!");
-            //Log.d("COMMENT",exception.getMessage());
+            //in case of an exception, toast and a debug messages are sent
+            Toast.makeText(context, ToastMessage.GET_LOGIN_PASSWORD_ERROR, Toast.LENGTH_LONG).show();
+            Log.d("DEBUG", "GET USER LOGIN PASSWORD LEAD TO ERROR!");
+            Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
+            return null;
         }
     }
 
-    public static String encryptData(String word) {
-        try {
-            byte[] ivBytes;
-            String password = "Hello";
-            /*you can give whatever you want for password. This is for testing purpose*/
-            SecureRandom random = new SecureRandom();
-            byte bytes[] = new byte[20];
-            random.nextBytes(bytes);
-            byte[] saltBytes = bytes;
-            // Derive the key
-            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-            PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), saltBytes, 65556, 256);
-            SecretKey secretKey = factory.generateSecret(spec);
-            SecretKeySpec secret = new SecretKeySpec(secretKey.getEncoded(), "AES");
-            //encrypting the word
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            cipher.init(Cipher.ENCRYPT_MODE, secret);
-            AlgorithmParameters params = cipher.getParameters();
-            ivBytes = params.getParameterSpec(IvParameterSpec.class).getIV();
-            byte[] encryptedTextBytes = cipher.doFinal(word.getBytes("UTF-8"));
-            //prepend salt and vi
-            byte[] buffer = new byte[saltBytes.length + ivBytes.length + encryptedTextBytes.length];
-            System.arraycopy(saltBytes, 0, buffer, 0, saltBytes.length);
-            System.arraycopy(ivBytes, 0, buffer, saltBytes.length, ivBytes.length);
-            System.arraycopy(encryptedTextBytes, 0, buffer, saltBytes.length + ivBytes.length, encryptedTextBytes.length);
-
-            return Base64.getEncoder().encodeToString(buffer);
-        }catch (Exception exception){
-            return "";
-        }
+    public static String encryptData(String word) throws Exception{
+        byte[] ivBytes;
+        String password = "Hello";
+        /*you can give whatever you want for password. This is for testing purpose*/
+        SecureRandom random = new SecureRandom();
+        byte bytes[] = new byte[20];
+        random.nextBytes(bytes);
+        byte[] saltBytes = bytes;
+        // Derive the key
+        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+        PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), saltBytes, 65556, 256);
+        SecretKey secretKey = factory.generateSecret(spec);
+        SecretKeySpec secret = new SecretKeySpec(secretKey.getEncoded(), "AES");
+        //encrypting the word
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        cipher.init(Cipher.ENCRYPT_MODE, secret);
+        AlgorithmParameters params = cipher.getParameters();
+        ivBytes = params.getParameterSpec(IvParameterSpec.class).getIV();
+        byte[] encryptedTextBytes = cipher.doFinal(word.getBytes("UTF-8"));
+        //prepend salt and vi
+        byte[] buffer = new byte[saltBytes.length + ivBytes.length + encryptedTextBytes.length];
+        System.arraycopy(saltBytes, 0, buffer, 0, saltBytes.length);
+        System.arraycopy(ivBytes, 0, buffer, saltBytes.length, ivBytes.length);
+        System.arraycopy(encryptedTextBytes, 0, buffer, saltBytes.length + ivBytes.length, encryptedTextBytes.length);
+        return Base64.getEncoder().encodeToString(buffer);
     }
 
-    public static String decryptData(String encryptedText){
+    public static String decryptData(String encryptedText) throws Exception{
         try {
             String password = "Hello";
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
@@ -415,12 +330,12 @@ public class User {
 
             return new String(decryptedTextBytes);
         }catch (Exception exception){
-
+            return null;
         }
-        return null;
     }
 
     public static Uri getPreinstalledIcon(Context context, String preInstalledIcon) {
+        //returning the desired icon based on spinner element
         Resources resources = context.getResources();
         int id = -1;
         switch (preInstalledIcon) {
@@ -483,6 +398,7 @@ public class User {
     }
 
     public static Uri getAutoIcon(Context context, EditText email) {
+        //returning the desired icon based on first letter of the email
         Resources resources = context.getResources();
         int id;
         if(email.getText().toString().toLowerCase().charAt(0) >= 'a' && email.getText().toString().toLowerCase().charAt(0) <= 'z')
@@ -512,6 +428,8 @@ public class User {
     }
 
     public static void init(Context context){
+        //getting all the passwords from the database and
+        //initializing the array for auto-generated icons
         passwordList.getAll(context);
         autoGenIcons[0] = R.drawable.a;
         autoGenIcons[1] = R.drawable.b;

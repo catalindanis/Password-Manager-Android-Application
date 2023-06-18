@@ -1,12 +1,10 @@
 package com.example.passwordmanager.HomePage;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -14,9 +12,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -24,11 +22,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.passwordmanager.AboutPage.About;
-import com.example.passwordmanager.AddPasswordPage.AddPassword;
+import com.example.passwordmanager.AddPasswordPage.PasswordManagerPage;
 import com.example.passwordmanager.Config.OnSwipeTouchListener;
 import com.example.passwordmanager.Config.RunningActivities;
 import com.example.passwordmanager.Config.ToastMessage;
-import com.example.passwordmanager.LoginPage.LoginPage;
 import com.example.passwordmanager.Password.Password;
 import com.example.passwordmanager.R;
 import com.example.passwordmanager.SettingsPage.Settings;
@@ -58,11 +55,6 @@ public class HomePage extends AppCompatActivity {
         RunningActivities.addActivity(this);
         RunningActivities.finishBackgroundActivitiesExcept(this);
 
-        //change User.isFirstTime variable to false,
-        //because if user entered in home page, then the variable must be false
-        if(User.isFirstTime(this))
-            User.setFirstTime(this,false);
-
         initializeValues();
 
         setupListeners();
@@ -74,33 +66,23 @@ public class HomePage extends AppCompatActivity {
         scrollView.setOnTouchListener(new OnSwipeTouchListener(this){
             @Override
             public void onSwipeRight() {
-                menuLayout.setVisibility(View.VISIBLE);
-
-                menuLayout.animate()
-                        .translationX(0)
-                        .setListener(null)
-                        .setDuration(250);
-
-                //bring layout to front, so that scrollview don't block user from pressing the buttons
-                menuLayout.bringToFront();
+                openMenu();
             }
 
             @Override
             public void onSwipeLeft() {
-                menuLayout.animate()
-                        .translationX(-menuLayout.getWidth())
-                        .setDuration(250)
-                        .setListener(new AnimatorListenerAdapter() {
-                            @Override
-                            public void onAnimationEnd(Animator animation) {
-                                super.onAnimationEnd(animation);
-                                menuLayout.setVisibility(View.INVISIBLE);
-                            }
-                        });
+                closeMenu();
+            }
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                Log.d("DEBUG","APASAT");
+                return super.onTouch(v, event);
             }
         });
 
         new Thread(new Runnable() {
+            //bluring the background when menu layout is visible
             @Override
             public void run() {
                 while(!isFinishing()){
@@ -112,41 +94,24 @@ public class HomePage extends AppCompatActivity {
         }).start();
 
         menuButton.setOnClickListener(view -> {
-            menuLayout.setVisibility(View.VISIBLE);
-
-            menuLayout.animate()
-                    .translationX(0)
-                    .setListener(null)
-                    .setDuration(250);
-
-            //bring layout to front, so that scrollview don't block user from pressing the buttons
-            menuLayout.bringToFront();
-
-            scrollView.animate().setDuration(250).alpha(0.4f);
+            openMenu();
         });
 
 
-        //at every button, bring image layout to front, so that button don't come above it
         addButton.setOnClickListener((view) -> {
-            addButtonIcon.bringToFront();
-
-            menuLayout.setVisibility(View.INVISIBLE);
-            startActivity(new Intent(HomePage.this, AddPassword.class));
+            closeMenu();
+            startActivity(new Intent(HomePage.this, PasswordManagerPage.class));
             overridePendingTransition(R.anim.slide_from_right,R.anim.slide_to_left);
         });
 
         settingsButton.setOnClickListener((view) -> {
-            settingsButtonIcon.bringToFront();
-
-            menuLayout.setVisibility(View.INVISIBLE);
+            closeMenu();
             startActivity(new Intent(HomePage.this, Settings.class));
             overridePendingTransition(R.anim.slide_from_right,R.anim.slide_to_left);
         });
 
         aboutButton.setOnClickListener((view) -> {
-            aboutButtonIcon.bringToFront();
-
-            menuLayout.setVisibility(View.INVISIBLE);
+            closeMenu();
             startActivity(new Intent(HomePage.this, About.class));
             overridePendingTransition(R.anim.slide_from_right,R.anim.slide_to_left);
         });
@@ -168,50 +133,64 @@ public class HomePage extends AppCompatActivity {
     }
 
     public void loadPasswords(){
+        //iterating over every password and adding it to the passwordListLayout
+        for(Password currentPassword : User.getPasswords()) {
+            try {
+                View passwordLayout = getLayoutInflater().inflate(R.layout.password, null);
 
-        if(User.getPasswords().size() == 0) {
-            //Log.d("COMMENT","THERE ARE NO PASSWORDS ADDED!");
-            return;
-        }
+                TextView passwordEmail = (TextView) passwordLayout.findViewById(R.id.passwordEmail);
+                //maximum text length 14 chars or @
+                passwordEmail.setText(currentPassword.getEmail().substring(0, currentPassword.getEmail().length() > 14 ? 14 : currentPassword.getEmail().length()).split("@")[0]);
 
-        //int id = 0;
-        for(Password currentPassword : User.getPasswords()){
+                ImageView passwordIcon = (ImageView) passwordLayout.findViewById(R.id.passwordIcon);
+                Bitmap bmp = BitmapFactory.decodeByteArray(currentPassword.getIcon(), 0, currentPassword.getIcon().length);
+                passwordIcon.setImageBitmap(bmp);
 
-            View passwordLayout = getLayoutInflater().inflate(R.layout.password, null);
+                ImageView editButton = (ImageView) passwordLayout.findViewById(R.id.passwordEdit);
 
-            TextView passwordEmail = (TextView) passwordLayout.findViewById(R.id.passwordEmail);
-            passwordEmail.setText(currentPassword.getEmail().substring(0,currentPassword.getEmail().length() > 14 ? 14 : currentPassword.getEmail().length()).split("@")[0]);
+                passwordListLayout.addView(passwordLayout);
 
-            ImageView passwordIcon = (ImageView) passwordLayout.findViewById(R.id.passwordIcon);
-            Bitmap bmp = BitmapFactory.decodeByteArray(currentPassword.getIcon(), 0, currentPassword.getIcon().length);
-            passwordIcon.setImageBitmap(bmp);
-
-            ImageView editButton = (ImageView) passwordLayout.findViewById(R.id.passwordEdit);
-            //int finalId = id;
-
-            passwordListLayout.addView(passwordLayout);
-
-            editButton.setOnClickListener((view) -> {
-                Intent intent = new Intent(this,AddPassword.class);
-                intent.putExtra("edit",true);
-                intent.putExtra("id",currentPassword.getId());
-                intent.putExtra("email",currentPassword.getEmail());
-                intent.putExtra("password",currentPassword.getPassword());
-                intent.putExtra("icon",currentPassword.getIcon());
-                intent.putExtra("auto_generate",currentPassword.isAuto_generate());
-                //intent.putExtra("index",passwordListLayout.indexOfChild(passwordLayout));
-                //startActivityForResult(intent,10002);
-                startActivity(intent);
-                overridePendingTransition(R.anim.slide_from_right,R.anim.slide_to_left);
-            });
-
-            //id++;
+                editButton.setOnClickListener((view) -> {
+                    Intent intent = new Intent(this, PasswordManagerPage.class);
+                    intent.putExtra("edit", true);
+                    intent.putExtra("id", currentPassword.getId());
+                    intent.putExtra("email", currentPassword.getEmail());
+                    intent.putExtra("password", currentPassword.getPassword());
+                    intent.putExtra("icon", currentPassword.getIcon());
+                    intent.putExtra("auto_generate", currentPassword.isAuto_generate());
+                    closeMenu();
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
+                });
+            }catch (Exception exception){
+                //in case of an exception, toast and a debug messages are sent
+                Toast.makeText(this, ToastMessage.CANT_LOAD_PASSWORD, Toast.LENGTH_LONG).show();
+                Log.d("DEBUG", "LOADING PASSWORD ID=" + currentPassword.getId() + " LEAD TO ERROR!");
+                Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
+            }
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    private void openMenu(){
+        menuLayout.setVisibility(View.VISIBLE);
+        menuLayout.bringToFront();
+        menuLayout.animate()
+                .translationX(0)
+                .setListener(null)
+                .setDuration(250);
+    }
+
+    private void closeMenu(){
+        menuLayout.animate()
+                .translationX(-menuLayout.getWidth())
+                .setDuration(250)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+                        menuLayout.setVisibility(View.INVISIBLE);
+                    }
+                });
     }
 
     boolean doubleBackToExitPressedOnce = false;
