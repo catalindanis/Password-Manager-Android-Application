@@ -7,35 +7,62 @@
         android:layout_height="match_parent"
         android:background="#171830"
         tools:context=".LoadingScreen.LoadingScreen">
+
+    <!--    <ImageView-->
+<!--        android:id="@+id/logo"-->
+<!--        android:layout_width="100dp"-->
+<!--        android:layout_height="100dp"-->
+<!--        android:layout_marginTop="168dp"-->
+<!--        android:layout_marginBottom="2dp"-->
+<!--        app:layout_constraintBottom_toTopOf="@+id/textView"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintHorizontal_bias="0.498"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintVertical_bias="1.0"-->
+<!--        app:srcCompat="@drawable/logo_square" />-->
+
     <ProgressBar
-            android:layout_width="200px"
-            android:layout_height="200px"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"
-            android:indeterminateTint="#7c6474"
-            app:layout_constraintEnd_toEndOf="parent" android:id="@+id/progressBar"/>
+        android:id="@+id/progressBar"
+        android:layout_width="200px"
+        android:layout_height="200px"
+        android:indeterminateTint="#7c6474"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.499" />
+
     <TextView
-            android:text="Password Manager"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:id="@+id/textView"
-            android:textColor="#fba127"
-            android:fontFamily="@font/app_nexabold"
-            android:textSize="100px"
-            app:drawableTint="#FFFFFF"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/progressBar" app:layout_constraintVertical_bias="0.901"
-            app:layout_constraintHorizontal_bias="0.491"/>
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/app_nunitobold"
+        android:text="PASSWORD MANAGER"
+        android:textColor="#fba127"
+        android:textSize="32dp"
+        app:drawableTint="#FFFFFF"
+        app:layout_constraintBottom_toTopOf="@+id/progressBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.924" />
+
     <TextView
-            android:text="powered by Danis"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:id="@+id/textView2"
-            android:textColor="#7c6474"
-            android:fontFamily="@font/app_nexabold"
-            android:textSize="35px"
-            app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintTop_toBottomOf="@+id/progressBar"
-            app:layout_constraintHorizontal_bias="0.985" app:layout_constraintVertical_bias="0.981"/>
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/app_nexabold"
+        android:text="powered by Danis"
+        android:textColor="#7c6474"
+        android:textSize="35px"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/progressBar"
+        app:layout_constraintVertical_bias="0.958" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

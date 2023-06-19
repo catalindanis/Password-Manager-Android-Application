@@ -1,5 +1,7 @@
 package com.example.passwordmanager.LoadingScreen;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
@@ -7,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.View;
 import android.view.animation.Animation;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,8 +34,6 @@ public class LoadingScreen extends AppCompatActivity{
         setContentView(R.layout.activity_loading_screen);
 
         RunningActivities.addActivity(this);
-
-        //User.removeLoginType(this);
 
         //starting desired class after loading processes are finished
         Handler handler = new Handler(Looper.getMainLooper());
@@ -60,6 +61,16 @@ public class LoadingScreen extends AppCompatActivity{
                 User.init(getApplicationContext());
             }
         }).start();
+
+
+        findViewById(R.id.textView).setVisibility(View.VISIBLE);
+        findViewById(R.id.textView).animate().setDuration(1000).alpha(0f).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                findViewById(R.id.textView).animate().setDuration(0).alpha(1);
+            }
+        });
     }
 
     //block user from exiting app when it is in loading screen

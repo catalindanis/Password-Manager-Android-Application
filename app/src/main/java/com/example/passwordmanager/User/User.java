@@ -414,6 +414,23 @@ public class User {
 
     }
 
+    public static Uri getAutoIcon(Context context, String email) {
+        //returning the desired icon based on first letter of the email
+        Resources resources = context.getResources();
+        int id;
+        if(email.toLowerCase().charAt(0) >= 'a' && email.toLowerCase().charAt(0) <= 'z')
+            id = autoGenIcons[email.toLowerCase().charAt(0) - 'a'];
+        else id = autoGenIcons[26];
+
+        return new Uri.Builder()
+                .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
+                .authority(resources.getResourcePackageName(id))
+                .appendPath(resources.getResourceTypeName(id))
+                .appendPath(resources.getResourceEntryName(id))
+                .build();
+
+    }
+
     public byte[] getBytes(InputStream inputStream) throws IOException {
         //transforming the inputStream image in a byte array
         ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();

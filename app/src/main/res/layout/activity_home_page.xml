@@ -59,6 +59,7 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintVertical_bias="0.0"
                     app:srcCompat="@drawable/logo_round" />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </LinearLayout>
@@ -73,79 +74,131 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        android:clickable="false">
 
 
-        <Button
-            android:id="@+id/addButton"
-            android:layout_width="match_parent"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/add"
+            android:layout_width="wrap_content"
             android:layout_height="77dp"
-            android:layout_marginTop="24dp"
-            android:background="@drawable/textlines"
-            android:fontFamily="@font/app_nunitoregular"
-            android:text="      ADD PASSWORD"
-            android:textSize="19sp"
+            android:layout_marginTop="180dp"
+            android:clickable="true"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
-            android:id="@+id/imageView6"
-            android:layout_width="36dp"
-            android:layout_height="32dp"
-            android:layout_marginTop="48dp"
-            android:elevation="2dp"
-            android:rotation="0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/add"
-            tools:srcCompat="@drawable/add" />
+            <Button
+                android:id="@+id/addButton"
+                android:layout_width="210dp"
+                android:layout_height="77dp"
+                android:clickable="false"
+                android:background="@drawable/textlines"
+                android:fontFamily="@font/app_nunitoregular"
+                android:text="      ADD PASSWORD"
+                android:textSize="19sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <Button
-            android:id="@+id/settingsButton"
-            android:layout_width="match_parent"
-            android:layout_height="74dp"
-            android:layout_marginTop="104dp"
-            android:background="@drawable/textlines"
-            android:fontFamily="@font/app_nunitoregular"
-            android:text="SETTINGS"
-            android:textSize="20sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            <ImageView
+                android:id="@+id/imageView6"
+                android:layout_width="36dp"
+                android:layout_height="32dp"
+                android:clickable="false"
+                android:layout_marginStart="1dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="21dp"
+                android:elevation="2dp"
+                android:rotation="0"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.488"
+                app:srcCompat="@drawable/add"
+                tools:srcCompat="@drawable/add" />
 
-        <ImageView
-            android:id="@+id/imageView8"
-            android:layout_width="36dp"
-            android:layout_height="32dp"
-            android:layout_marginTop="124dp"
-            android:elevation="2dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/settings"
-            tools:srcCompat="@drawable/settings" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <Button
-            android:id="@+id/aboutButton"
-            android:layout_width="match_parent"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/settings"
+            android:layout_width="wrap_content"
             android:layout_height="77dp"
-            android:layout_marginTop="700dp"
-            android:background="@drawable/textlines"
-            android:fontFamily="@font/app_nunitoregular"
-            android:text="ABOUT"
-            android:textSize="20sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-
-        <ImageView
-            android:id="@+id/imageView7"
-            android:layout_width="36dp"
-            android:layout_height="32dp"
-            android:layout_marginTop="721dp"
-            android:elevation="2dp"
+            android:layout_marginTop="260dp"
+            android:background="@android:color/transparent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/info"
-            tools:srcCompat="@drawable/info" />
+            android:clickable="true">
+
+            <Button
+                android:id="@+id/settingsButton"
+                android:layout_width="210dp"
+                android:layout_height="74dp"
+                android:clickable="false"
+                android:background="@drawable/textlines"
+                android:fontFamily="@font/app_nunitoregular"
+                android:text="SETTINGS"
+                android:textSize="20sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/imageView8"
+                android:layout_width="36dp"
+                android:layout_height="32dp"
+                android:clickable="false"
+                android:elevation="2dp"
+                app:layout_constraintBottom_toBottomOf="@+id/settingsButton"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.523"
+                app:srcCompat="@drawable/settings"
+                tools:srcCompat="@drawable/settings" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/about"
+            android:layout_width="wrap_content"
+            android:layout_height="77dp"
+            android:layout_marginBottom="80dp"
+            android:background="@android:color/transparent"
+            android:clickable="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <Button
+                android:id="@+id/aboutButton"
+                android:layout_width="210dp"
+                android:layout_height="77dp"
+                android:background="@drawable/textlines"
+                android:clickable="false"
+                android:fontFamily="@font/app_nunitoregular"
+                android:text="ABOUT"
+                android:textSize="20sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+            <ImageView
+                android:id="@+id/imageView7"
+                android:layout_width="36dp"
+                android:layout_height="32dp"
+                android:clickable="false"
+                android:elevation="2dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/aboutButton"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/aboutButton"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.488"
+                app:srcCompat="@drawable/info"
+                tools:srcCompat="@drawable/info" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

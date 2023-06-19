@@ -5,9 +5,11 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -17,6 +19,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,16 +40,16 @@ public class HomePage extends AppCompatActivity {
     ConstraintLayout menuLayout;
     LinearLayout passwordListLayout;
     ScrollView scrollView;
-    //LinearLayout passwordListLayout;
-    Button addButton;
-    Button settingsButton;
-    Button aboutButton;
+    ConstraintLayout add;
+    ConstraintLayout settings;
+    ConstraintLayout about;
+
     ImageView addButtonIcon;
     ImageView settingsButtonIcon;
     ImageView aboutButtonIcon;
-
     ImageView menuButton;
-
+    Dialog dialog;
+    boolean isClosing;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,7 +66,9 @@ public class HomePage extends AppCompatActivity {
     }
 
     private void setupListeners() {
+
         scrollView.setOnTouchListener(new OnSwipeTouchListener(this){
+            int click = 0;
             @Override
             public void onSwipeRight() {
                 openMenu();
@@ -76,41 +81,29 @@ public class HomePage extends AppCompatActivity {
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                Log.d("DEBUG","APASAT");
+                if(click <= 1 && event.getX() >= menuLayout.getX()+menuLayout.getWidth())
+                    closeMenu();
                 return super.onTouch(v, event);
             }
         });
-
-        new Thread(new Runnable() {
-            //bluring the background when menu layout is visible
-            @Override
-            public void run() {
-                while(!isFinishing()){
-                    if(menuLayout.getVisibility() == View.VISIBLE)
-                        scrollView.setAlpha(0.4f);
-                    else scrollView.setAlpha(1);
-                }
-            }
-        }).start();
 
         menuButton.setOnClickListener(view -> {
             openMenu();
         });
 
-
-        addButton.setOnClickListener((view) -> {
+        add.setOnClickListener((view) -> {
             closeMenu();
             startActivity(new Intent(HomePage.this, PasswordManagerPage.class));
             overridePendingTransition(R.anim.slide_from_right,R.anim.slide_to_left);
         });
 
-        settingsButton.setOnClickListener((view) -> {
+        settings.setOnClickListener((view) -> {
             closeMenu();
             startActivity(new Intent(HomePage.this, Settings.class));
             overridePendingTransition(R.anim.slide_from_right,R.anim.slide_to_left);
         });
 
-        aboutButton.setOnClickListener((view) -> {
+        about.setOnClickListener((view) -> {
             closeMenu();
             startActivity(new Intent(HomePage.this, About.class));
             overridePendingTransition(R.anim.slide_from_right,R.anim.slide_to_left);
@@ -122,12 +115,9 @@ public class HomePage extends AppCompatActivity {
         menuLayout = (ConstraintLayout) findViewById(R.id.MenuLayout);
         passwordListLayout = (LinearLayout) findViewById(R.id.PasswordListLayout);
         scrollView = (ScrollView) findViewById(R.id.ScrollView);
-        addButton = (Button) findViewById(R.id.addButton);
-        settingsButton = (Button) findViewById(R.id.settingsButton);
-        aboutButton = (Button) findViewById(R.id.aboutButton);
-        addButtonIcon = (ImageView) findViewById(R.id.imageView6);
-        settingsButtonIcon = (ImageView) findViewById(R.id.imageView8);
-        aboutButtonIcon = (ImageView) findViewById(R.id.imageView7);
+        add = (ConstraintLayout) findViewById(R.id.add);
+        settings = (ConstraintLayout) findViewById(R.id.settings);
+        about = (ConstraintLayout) findViewById(R.id.about);
         menuButton = (ImageView) findViewById(R.id.menuButton);
         menuLayout.setVisibility(View.INVISIBLE);
     }
@@ -185,6 +175,10 @@ public class HomePage extends AppCompatActivity {
     }
 
     private void openMenu(){
+        if(menuLayout.getVisibility() != View.INVISIBLE)
+            return;
+
+        scrollView.setAlpha(0.4f);
         menuLayout.setVisibility(View.VISIBLE);
         menuLayout.bringToFront();
         menuLayout.animate()
@@ -194,6 +188,14 @@ public class HomePage extends AppCompatActivity {
     }
 
     private void closeMenu(){
+        if(isClosing)
+            return;
+
+        if(menuLayout.getVisibility() != View.VISIBLE)
+            return;
+
+        isClosing = true;
+        scrollView.setAlpha(1);
         menuLayout.animate()
                 .translationX(-menuLayout.getWidth())
                 .setDuration(250)
@@ -202,6 +204,7 @@ public class HomePage extends AppCompatActivity {
                     public void onAnimationEnd(Animator animation) {
                         super.onAnimationEnd(animation);
                         menuLayout.setVisibility(View.INVISIBLE);
+                        isClosing = false;
                     }
                 });
     }
@@ -220,9 +223,12 @@ public class HomePage extends AppCompatActivity {
         new Handler(Looper.getMainLooper()).postDelayed(() -> doubleBackToExitPressedOnce=false, 2000);
     }
 
+    boolean first = false;
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        menuLayout.setX(-menuLayout.getWidth());
+        if(!first)
+            menuLayout.setX(-menuLayout.getWidth());
+        first = true;
     }
 }
