@@ -50,33 +50,68 @@
 
                 <ImageView
                     android:id="@+id/imageView"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-
+                    android:layout_width="45dp"
+                    android:layout_height="45dp"
                     android:layout_marginEnd="16dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintVertical_bias="0.0"
-                    app:srcCompat="@drawable/logo_round" />
+                    app:srcCompat="@drawable/icon_no_background" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </LinearLayout>
     </ScrollView>
 
+    <TextView
+        android:id="@+id/textView9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="650dp"
+        android:fontFamily="@font/app_nunitoregular"
+        android:text="Your passwords will be shown here"
+        android:textColor="@color/app_yellow"
+        android:textSize="20dp"
+        app:layout_constraintBottom_toBottomOf="@+id/ScrollView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/ScrollView" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/MenuLayout"
         android:layout_width="210dp"
         android:layout_height="match_parent"
         android:background="@color/mikado_yellow"
+        android:clickable="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:clickable="false">
+        app:layout_constraintTop_toTopOf="parent">
 
+
+        <ImageView
+            android:id="@+id/imageView3"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginTop="35dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/icon_no_background" />
+
+        <TextView
+            android:id="@+id/textView7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/app_nunitobold"
+            android:text="PASSWORD MANAGER"
+            android:textColor="@color/app_mid_blue"
+            android:textSize="15dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageView3" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/add"
@@ -92,8 +127,8 @@
                 android:id="@+id/addButton"
                 android:layout_width="210dp"
                 android:layout_height="77dp"
-                android:clickable="false"
                 android:background="@drawable/textlines"
+                android:clickable="false"
                 android:fontFamily="@font/app_nunitoregular"
                 android:text="      ADD PASSWORD"
                 android:textSize="19sp"
@@ -104,10 +139,10 @@
                 android:id="@+id/imageView6"
                 android:layout_width="36dp"
                 android:layout_height="32dp"
-                android:clickable="false"
                 android:layout_marginStart="1dp"
                 android:layout_marginTop="24dp"
                 android:layout_marginBottom="21dp"
+                android:clickable="false"
                 android:elevation="2dp"
                 android:rotation="0"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -127,16 +162,16 @@
             android:layout_height="77dp"
             android:layout_marginTop="260dp"
             android:background="@android:color/transparent"
+            android:clickable="true"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:clickable="true">
+            app:layout_constraintTop_toTopOf="parent">
 
             <Button
                 android:id="@+id/settingsButton"
                 android:layout_width="210dp"
-                android:layout_height="74dp"
-                android:clickable="false"
+                android:layout_height="77dp"
                 android:background="@drawable/textlines"
+                android:clickable="false"
                 android:fontFamily="@font/app_nunitoregular"
                 android:text="SETTINGS"
                 android:textSize="20sp"
@@ -144,17 +179,21 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
-                android:id="@+id/imageView8"
+                android:id="@+id/imageView4"
                 android:layout_width="36dp"
                 android:layout_height="32dp"
+                android:layout_marginStart="1dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="21dp"
                 android:clickable="false"
                 android:elevation="2dp"
-                app:layout_constraintBottom_toBottomOf="@+id/settingsButton"
+                android:rotation="0"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.523"
+                app:layout_constraintVertical_bias="0.0"
                 app:srcCompat="@drawable/settings"
                 tools:srcCompat="@drawable/settings" />
 

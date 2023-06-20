@@ -9,6 +9,7 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -120,9 +121,14 @@ public class HomePage extends AppCompatActivity {
         about = (ConstraintLayout) findViewById(R.id.about);
         menuButton = (ImageView) findViewById(R.id.menuButton);
         menuLayout.setVisibility(View.INVISIBLE);
+        addButtonIcon = (ImageView) findViewById(R.id.imageView6);
     }
 
     public void loadPasswords(){
+        if(User.getPasswords().size() > 0){
+            findViewById(R.id.textView9).setVisibility(View.INVISIBLE);
+        }
+
         //iterating over every password and adding it to the passwordListLayout
         for(Password currentPassword : User.getPasswords()) {
             try {
@@ -179,6 +185,7 @@ public class HomePage extends AppCompatActivity {
             return;
 
         scrollView.setAlpha(0.4f);
+        findViewById(R.id.textView9).setAlpha(0.4f);
         menuLayout.setVisibility(View.VISIBLE);
         menuLayout.bringToFront();
         menuLayout.animate()
@@ -196,6 +203,7 @@ public class HomePage extends AppCompatActivity {
 
         isClosing = true;
         scrollView.setAlpha(1);
+        findViewById(R.id.textView9).setAlpha(1);
         menuLayout.animate()
                 .translationX(-menuLayout.getWidth())
                 .setDuration(250)

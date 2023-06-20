@@ -64,11 +64,19 @@ public class LoadingScreen extends AppCompatActivity{
 
 
         findViewById(R.id.textView).setVisibility(View.VISIBLE);
-        findViewById(R.id.textView).animate().setDuration(1000).alpha(0f).setListener(new AnimatorListenerAdapter() {
+        findViewById(R.id.textView).animate().setDuration(1500).alpha(0f).setListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
                 findViewById(R.id.textView).animate().setDuration(0).alpha(1);
+            }
+        });
+        findViewById(R.id.logo).setVisibility(View.VISIBLE);
+        findViewById(R.id.logo).animate().setDuration(1500).alpha(0f).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                findViewById(R.id.logo).animate().setDuration(0).alpha(1);
             }
         });
     }
