@@ -35,6 +35,8 @@ import com.example.passwordmanager.R;
 import com.example.passwordmanager.SettingsPage.Settings;
 import com.example.passwordmanager.User.User;
 
+import org.w3c.dom.Text;
+
 public class HomePage extends AppCompatActivity {
 
     ConstraintLayout screen;
@@ -50,6 +52,7 @@ public class HomePage extends AppCompatActivity {
     ImageView aboutButtonIcon;
     ImageView menuButton;
     Dialog dialog;
+    TextView emptyList;
     boolean isClosing;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,11 +125,12 @@ public class HomePage extends AppCompatActivity {
         menuButton = (ImageView) findViewById(R.id.menuButton);
         menuLayout.setVisibility(View.INVISIBLE);
         addButtonIcon = (ImageView) findViewById(R.id.imageView6);
+        emptyList = (TextView) findViewById(R.id.textView9);
     }
 
     public void loadPasswords(){
         if(User.getPasswords().size() > 0){
-            findViewById(R.id.textView9).setVisibility(View.INVISIBLE);
+            emptyList.setVisibility(View.GONE);
         }
 
         //iterating over every password and adding it to the passwordListLayout

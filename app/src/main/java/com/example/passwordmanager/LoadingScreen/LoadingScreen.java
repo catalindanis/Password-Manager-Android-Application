@@ -53,7 +53,6 @@ public class LoadingScreen extends AppCompatActivity{
 
         if(User.getLoginType(this) != LoginType.NULL)
             cls = LoginPage.class;
-        else User.removePasswords(this);
 
         new Thread(new Runnable() {
             @Override

@@ -128,22 +128,25 @@ public class PasswordList extends ArrayList<Password> {
     public void removeAll(Context context){
         try{
             //removing all passwords from memory list
-            for (Password password : this) {
-                this.remove(password);
-                Log.d("DEBUG","PASSWORD ID=" + password.getId() + " REMOVED SUCCESSFULLY! (memory list)");
-            }
+            this.removeAll(User.getPasswords());
+            Log.d("DEBUG","REMOVED ALL PASSWORDS SUCCESSFULLY! (memory list)");
 
-            //drops and recreates the desired table for the passwords
-            Passwords_Database db = new Passwords_Database(context);
-            SQLiteDatabase database = db.getWritableDatabase();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    //drops and recreates the desired table for the passwords
+                    Passwords_Database db = new Passwords_Database(context);
+                    SQLiteDatabase database = db.getWritableDatabase();
 
-            String statement = "DROP TABLE " + PASSWORDS_TABLE;
-            database.execSQL(statement);
+                    String statement = "DROP TABLE " + PASSWORDS_TABLE;
+                    database.execSQL(statement);
 
-            statement = "CREATE TABLE " + PASSWORDS_TABLE + "(id int, email varchar(255), password varchar(255), icon blob, auto_generate number(1))";
-            database.execSQL(statement);
+                    statement = "CREATE TABLE " + PASSWORDS_TABLE + "(id int, email varchar(255), password varchar(255), icon blob, auto_generate number(1))";
+                    database.execSQL(statement);
 
-            Log.d("DEBUG","REMOVED ALL PASSWORDS SUCCESSFULLY!");
+                    Log.d("DEBUG","REMOVED ALL PASSWORDS SUCCESSFULLY! (database)");
+                }
+            }).start();
         }
         catch (Exception exception){
             //in case of an exception, toast and a debug messages are sent

@@ -293,6 +293,10 @@ public class PasswordManagerPage extends AppCompatActivity {
                 }
             }
         });
+
+        findViewById(R.id.backButton).setOnClickListener(view -> {
+            onBackPressed();
+        });
     }
 
     private void setupEditListeners() {

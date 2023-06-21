@@ -47,6 +47,7 @@ public class User {
     private static final String LOGIN_TYPE_TABLE = "login_type";
     private static final String FIRST_TIME_TABLE = "first_time";
     private static final String LOGIN_PASSWORD_TABLE = "login_password";
+    private static String loginPassword = new String();
     private static int[] autoGenIcons = new int[100];
     public static void addPassword(Context context, Password password){ passwordList.save(password,context); }
 
@@ -226,10 +227,7 @@ public class User {
 
     public static boolean verifyLoginPassword(Context context,String enteredPassword) {
         try{
-            //decrypting password from database
-            String decryptedPassword = decryptData(getLoginPassword(context));
-
-            if (decryptedPassword.equals(enteredPassword)) {
+            if (getLoginPassword(context).equals(enteredPassword)) {
                 Log.d("DEBUG", "USER LOGIN PASSWORD IS CORRECT!");
                 return true;
             }
@@ -246,6 +244,10 @@ public class User {
     }
 
     private static String getLoginPassword(Context context) {
+        return loginPassword;
+    }
+
+    private static void getLoginPasswordFromDB(Context context) {
         //read the loginPassword from it's database table, and returns it
         try {
             String password = new String();
@@ -263,14 +265,19 @@ public class User {
             database.close();
 
             Log.d("DEBUG","GET USER LOGIN PASSWORD SUCCESSFULLY!");
-            return password;
+            loginPassword = decryptData(password);
         }catch (Exception exception){
             //in case of an exception, toast and a debug messages are sent
             Toast.makeText(context, ToastMessage.GET_LOGIN_PASSWORD_ERROR, Toast.LENGTH_LONG).show();
             Log.d("DEBUG", "GET USER LOGIN PASSWORD LEAD TO ERROR!");
             Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
-            return null;
+            loginPassword = null;
         }
+    }
+
+    public static void eraseData(Context context){
+        User.removeLoginType(context);
+        User.removePasswords(context);
     }
 
     public static String encryptData(String word) throws Exception{
@@ -448,6 +455,7 @@ public class User {
         //getting all the passwords from the database and
         //initializing the array for auto-generated icons
         passwordList.getAll(context);
+        getLoginPasswordFromDB(context);
         autoGenIcons[0] = R.drawable.a;
         autoGenIcons[1] = R.drawable.b;
         autoGenIcons[2] = R.drawable.c;

@@ -71,6 +71,10 @@ public class SetupPasswordPage extends AppCompatActivity {
             else
                 wrongPasswordMessage.setText("Passwords might not match or fields are empty");
         });
+
+        findViewById(R.id.imageView5).setOnClickListener(view -> {
+            onBackPressed();
+        });
     }
 
     private void initializeValues() {
@@ -82,5 +86,11 @@ public class SetupPasswordPage extends AppCompatActivity {
         showPassword = (Switch) findViewById(R.id.switch1);
 
         continueButton = (Button) findViewById(R.id.setupPasswordContinue);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.slide_from_left,R.anim.slide_to_right);
     }
 }
