@@ -9,18 +9,14 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.Image;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,10 +28,8 @@ import com.example.passwordmanager.Config.RunningActivities;
 import com.example.passwordmanager.Config.ToastMessage;
 import com.example.passwordmanager.Password.Password;
 import com.example.passwordmanager.R;
-import com.example.passwordmanager.SettingsPage.Settings;
+import com.example.passwordmanager.SettingsPage.SettingsPage;
 import com.example.passwordmanager.User.User;
-
-import org.w3c.dom.Text;
 
 public class HomePage extends AppCompatActivity {
 
@@ -103,7 +97,7 @@ public class HomePage extends AppCompatActivity {
 
         settings.setOnClickListener((view) -> {
             closeMenu();
-            startActivity(new Intent(HomePage.this, Settings.class));
+            startActivity(new Intent(HomePage.this, SettingsPage.class));
             overridePendingTransition(R.anim.slide_from_right,R.anim.slide_to_left);
         });
 
@@ -156,6 +150,7 @@ public class HomePage extends AppCompatActivity {
                     intent.putExtra("id", currentPassword.getId());
                     intent.putExtra("email", currentPassword.getEmail());
                     intent.putExtra("password", currentPassword.getPassword());
+                    intent.putExtra("extra", currentPassword.getExtra());
                     intent.putExtra("icon", currentPassword.getIcon());
                     intent.putExtra("auto_generate", currentPassword.isAuto_generate());
                     closeMenu();
@@ -169,6 +164,7 @@ public class HomePage extends AppCompatActivity {
                     intent.putExtra("id", currentPassword.getId());
                     intent.putExtra("email", currentPassword.getEmail());
                     intent.putExtra("password", currentPassword.getPassword());
+                    intent.putExtra("extra", currentPassword.getExtra());
                     intent.putExtra("icon", currentPassword.getIcon());
                     intent.putExtra("auto_generate", currentPassword.isAuto_generate());
                     closeMenu();

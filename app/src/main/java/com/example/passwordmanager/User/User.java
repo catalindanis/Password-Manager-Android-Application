@@ -7,30 +7,29 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.Environment;
 import android.util.Log;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import androidx.documentfile.provider.DocumentFile;
 
 import com.example.passwordmanager.Config.ToastMessage;
 import com.example.passwordmanager.Config.LoginType;
 import com.example.passwordmanager.LoadingScreen.LoadingScreen;
 import com.example.passwordmanager.Password.Password;
 import com.example.passwordmanager.Password.PasswordList;
-import com.example.passwordmanager.Password.Passwords_Database;
 import com.example.passwordmanager.R;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.security.AlgorithmParameters;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.Base64;
-import java.util.List;
 import java.util.Random;
 
 import javax.crypto.BadPaddingException;
@@ -272,6 +271,32 @@ public class User {
             Log.d("DEBUG", "GET USER LOGIN PASSWORD LEAD TO ERROR!");
             Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
             loginPassword = null;
+        }
+    }
+
+    public static String formatData(){
+        StringBuilder text = new StringBuilder();
+        text.append("PASSWORDS : \n\n");
+        for(Password password : getPasswords()){
+            text.append("ID : " + password.getId() + "\n");
+            text.append("EMAIL : " + password.getEmail() + "\n");
+            text.append("PASSWORD : " + password.getPassword() + "\n");
+            text.append("EXTRA : " + password.getExtra() + "\n");
+            text.append("\n");
+        }
+        return text.toString();
+    }
+
+    public static void saveData(Context context){
+        try {
+            String fileDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).getPath();
+            FileWriter writer = new FileWriter(fileDirectory + "/PasswordManager.txt");
+            writer.write(formatData());
+            writer.close();
+            Toast.makeText(context, "SAVED : " + fileDirectory, Toast.LENGTH_LONG).show();
+        }
+        catch (Exception exception){
+            Log.d("DEBUG",exception.getMessage());
         }
     }
 

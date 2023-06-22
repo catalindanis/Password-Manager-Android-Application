@@ -3,6 +3,7 @@ package com.example.passwordmanager.Config;
 public class ToastMessage {
     public static final String PRESS_DOUBLE_TO_EXIT = "Please click BACK again to exit";
     public static final String COPIED_TO_CLIPBOARD = "Copied to clipboard!";
+    public static final String CANT_USE_BIOMETRICS = "Can't user your biometrics right now!";
 
 
     public static final String SETUP_LOGIN_TYPE_ERROR = "Can't set your login type!";

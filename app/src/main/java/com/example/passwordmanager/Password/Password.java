@@ -14,20 +14,32 @@ public class Password {
     private byte[] icon;
     private int auto_generate;
 
-    public Password(int id, String email, String password, byte[] icon, int auto_generate){
+    private String extra;
+
+    public Password(int id, String email, String password, byte[] icon, String extra, int auto_generate){
         this.id = id;
         this.email = email;
         this.password = password;
         this.icon = icon;
         this.auto_generate = auto_generate;
+        this.extra = extra;
     }
 
-    public Password(String email, String password, byte[] icon, int auto_generate){
+    public Password(String email, String password, byte[] icon, String extra, int auto_generate){
         this.id = User.generateId();
         this.email = email;
         this.password = password;
         this.icon = icon;
         this.auto_generate = auto_generate;
+        this.extra = extra;
+    }
+
+    public String getExtra() {
+        return extra;
+    }
+
+    public void setExtra(String extra) {
+        this.extra = extra;
     }
 
     public int getId(){

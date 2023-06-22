@@ -13,7 +13,7 @@ public class Passwords_Database extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String statement = "CREATE TABLE PASSWORDS (id int, email varchar(255), password varchar(255), icon blob, auto_generate number(1))";
+        String statement = "CREATE TABLE PASSWORDS (id int, email varchar(255), password varchar(255), extra varchar(255), icon blob, auto_generate number(1))";
         db.execSQL(statement);
     }
 

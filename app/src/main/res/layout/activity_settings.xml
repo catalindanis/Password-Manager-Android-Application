@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#171830"
-    tools:context=".SettingsPage.Settings">
+    tools:context=".SettingsPage.SettingsPage">
 
     <ScrollView
         android:id="@+id/ScrollView"
@@ -35,18 +35,18 @@
                     app:layout_constraintVertical_bias="0.52"
                     app:srcCompat="@drawable/resource_return" />
 
-                                <TextView
-                                    android:id="@+id/textView7"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="@font/app_nunitobold"
-                                    android:text="PASSWORD MANAGER"
-                                    android:textColor="@color/app_gray"
-                                    android:textSize="20dp"
-                                    app:layout_constraintBottom_toBottomOf="parent"
-                                    app:layout_constraintEnd_toEndOf="parent"
-                                    app:layout_constraintStart_toStartOf="parent"
-                                    app:layout_constraintTop_toTopOf="parent" />
+                <TextView
+                    android:id="@+id/textView7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/app_nunitobold"
+                    android:text="SETTINGS"
+                    android:textColor="@color/app_gray"
+                    android:textSize="20dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                                 <ImageView
                                     android:id="@+id/imageView"

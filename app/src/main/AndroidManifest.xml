@@ -14,31 +14,44 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@drawable/icon"
         android:supportsRtl="true"
-        android:theme="@style/Theme.PasswordManager">
+        android:theme="@style/Theme.PasswordManager"
+        android:screenOrientation="portrait">
         <activity
-            android:name=".SettingsPage.Settings"
-            android:exported="false" />
+            android:name=".Troubleshooter.TroubleshooterPage"
+            android:exported="false"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".SettingsPage.SettingsPage"
+            android:exported="false"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".AboutPage.About"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".AddPasswordPage.PasswordManagerPage"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".LoginPage.SetupLoginPage"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".HomePage.HomePage"
-            android:exported="true" />
+            android:exported="true"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".LoginPage.SetupPasswordPage"
-            android:exported="true" />
+            android:exported="true"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".LoginPage.LoginPage"
-            android:exported="true" />
+            android:exported="true"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".LoadingScreen.LoadingScreen"
-            android:exported="true">
+            android:exported="true"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

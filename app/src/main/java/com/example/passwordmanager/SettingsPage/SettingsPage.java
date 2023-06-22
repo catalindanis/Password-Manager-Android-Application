@@ -1,5 +1,6 @@
 package com.example.passwordmanager.SettingsPage;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
@@ -9,15 +10,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.view.View;
-import android.widget.Toast;
+import android.util.Log;
 
-import com.example.passwordmanager.AddPasswordPage.PasswordManagerPage;
 import com.example.passwordmanager.Config.DialogBehaviour;
 import com.example.passwordmanager.Config.DialogPrompt;
 import com.example.passwordmanager.Config.LoginType;
 import com.example.passwordmanager.Config.RunningActivities;
-import com.example.passwordmanager.Config.ToastMessage;
 import com.example.passwordmanager.HomePage.HomePage;
 import com.example.passwordmanager.LoadingScreen.LoadingScreen;
 import com.example.passwordmanager.LoginPage.SetupLoginPage;
@@ -25,7 +23,7 @@ import com.example.passwordmanager.LoginPage.SetupPasswordPage;
 import com.example.passwordmanager.R;
 import com.example.passwordmanager.User.User;
 
-public class Settings extends AppCompatActivity {
+public class SettingsPage extends AppCompatActivity {
 
     ConstraintLayout removeAllPasswords;
     ConstraintLayout changeLoginPassword;
@@ -82,7 +80,7 @@ public class Settings extends AppCompatActivity {
                     }
                 });
 
-                startActivity(new Intent(Settings.this, SetupPasswordPage.class));
+                startActivity(new Intent(SettingsPage.this, SetupPasswordPage.class));
             });
         }
 
@@ -96,7 +94,7 @@ public class Settings extends AppCompatActivity {
             });
 
 
-            startActivity(new Intent(Settings.this, SetupLoginPage.class).putExtra("override",false));
+            startActivity(new Intent(SettingsPage.this, SetupLoginPage.class).putExtra("override",false));
         });
 
         runTroubleshooter.setOnClickListener(view -> {
@@ -117,6 +115,7 @@ public class Settings extends AppCompatActivity {
                     downloadPasswords.animate().setDuration(500).translationX(-10);
                 }
             });
+            User.saveData(getApplicationContext());
         });
 
         eraseAllData.setOnClickListener(view -> {
@@ -137,7 +136,7 @@ public class Settings extends AppCompatActivity {
                         public void run() {
                             User.eraseData(getApplicationContext());
                             RunningActivities.finishAllActivities();
-                            startActivity(new Intent(Settings.this, LoadingScreen.class));
+                            startActivity(new Intent(SettingsPage.this, LoadingScreen.class));
                         }
                     }, 1000);
                 }
@@ -169,9 +168,14 @@ public class Settings extends AppCompatActivity {
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
     public void onBackPressed() {
         super.onBackPressed();
-        startActivity(new Intent(Settings.this, HomePage.class));
+        startActivity(new Intent(SettingsPage.this, HomePage.class));
         overridePendingTransition(R.anim.slide_from_left,R.anim.slide_to_right);
         RunningActivities.finishAllActivities();
     }

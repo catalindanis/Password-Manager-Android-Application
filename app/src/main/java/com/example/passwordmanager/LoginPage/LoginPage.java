@@ -125,6 +125,9 @@ public class LoginPage extends AppCompatActivity {
 
                 biometricPrompt.authenticate(promptInfo);
             }
+            else{
+                Toast.makeText(this,ToastMessage.CANT_USE_BIOMETRICS,Toast.LENGTH_SHORT).show();
+            }
         });
     }
 

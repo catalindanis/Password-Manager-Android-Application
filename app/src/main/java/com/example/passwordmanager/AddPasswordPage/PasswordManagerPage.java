@@ -49,6 +49,7 @@ import java.io.InputStream;
 public class PasswordManagerPage extends AppCompatActivity {
     EditText email;
     EditText password;
+    EditText extra;
     Switch showPassword;
     Button addButton;
     Uri icon = null;
@@ -170,7 +171,7 @@ public class PasswordManagerPage extends AppCompatActivity {
 
             //adding the password and finishing all activities
             //restarting HomePage activity so that the new password will be also loaded
-            User.addPassword(this,new Password(email.getText().toString(),password.getText().toString(),inputData,auto_generate));
+            User.addPassword(this,new Password(email.getText().toString(),password.getText().toString(),inputData, extra.getText().toString(),auto_generate));
             startActivity(new Intent(PasswordManagerPage.this, HomePage.class));
             overridePendingTransition(R.anim.slide_from_left,R.anim.slide_to_right);
             RunningActivities.finishAllActivities();
@@ -358,7 +359,7 @@ public class PasswordManagerPage extends AppCompatActivity {
 
             //updating the password and finishing all activities
             //restarting HomePage activity so that the new password will be also loaded
-            User.updatePassword(this, getIntent().getExtras().getInt("id"), new Password(email.getText().toString(),password.getText().toString(),inputData,auto_generate));
+            User.updatePassword(this, getIntent().getExtras().getInt("id"), new Password(email.getText().toString(),password.getText().toString(),inputData, extra.getText().toString(),auto_generate));
             startActivity(new Intent(PasswordManagerPage.this, HomePage.class));
             overridePendingTransition(R.anim.slide_from_left,R.anim.slide_to_right);
             RunningActivities.finishAllActivities();
@@ -406,6 +407,7 @@ public class PasswordManagerPage extends AppCompatActivity {
     private void initializeValues() {
         email = (EditText) findViewById(R.id.addUsername);
         password = (EditText) findViewById(R.id.addPassword);
+        extra = (EditText) findViewById(R.id.addExtra);
         showPassword = (Switch) findViewById(R.id.switch2);
         addButton = (Button) findViewById(R.id.addPasswordSave);
         wrongFieldsMessage = (TextView) findViewById(R.id.addEmptyFields);
@@ -430,6 +432,7 @@ public class PasswordManagerPage extends AppCompatActivity {
 
         email.setText(bundle.getString("email"));
         password.setText(bundle.getString("password"));
+        extra.setText(bundle.getString("extra"));
         inputData = bundle.getByteArray("icon");
 
         copyEmail.setVisibility(View.INVISIBLE);
@@ -450,10 +453,14 @@ public class PasswordManagerPage extends AppCompatActivity {
 
         email.setText(bundle.getString("email"));
         password.setText(bundle.getString("password"));
+        extra.setText(bundle.getString("extra"));
         inputData = bundle.getByteArray("icon");
 
         email.setEnabled(false);
         password.setEnabled(false);
+        extra.setFocusable(false);
+        extra.setCursorVisible(false);
+        extra.setKeyListener(null);
 
         wrongFieldsMessage.setVisibility(View.INVISIBLE);
         spinnerArrow.setVisibility(View.INVISIBLE);
@@ -461,12 +468,16 @@ public class PasswordManagerPage extends AppCompatActivity {
 
         email.animate().translationY(200f).setDuration(0);
         password.animate().translationY(200f).setDuration(0);
+        extra.animate().translationY(200f).setDuration(0);
         findViewById(R.id.textView3).animate().translationY(200f).setDuration(0);
         findViewById(R.id.textView4).animate().translationY(200f).setDuration(0);
+        findViewById(R.id.textView5).animate().translationY(200f).setDuration(0);
         copyEmail.animate().translationY(200f).setDuration(0);
         copyPassword.animate().translationY(200f).setDuration(0);
         showPassword.animate().translationY(200f).setDuration(0);
         passwordIcon.animate().translationY(100f).setDuration(0);
+
+        findViewById(R.id.backButton).setVisibility(View.INVISIBLE);
 
         Bitmap bmp = BitmapFactory.decodeByteArray(inputData, 0, inputData.length);
         passwordIcon.setImageBitmap(bmp);

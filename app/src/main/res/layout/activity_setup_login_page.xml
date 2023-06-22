@@ -1,57 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#171830"
-        tools:context=".LoginPage.LoginPage">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#171830"
+    tools:context=".LoginPage.LoginPage">
 
     <Button
-            android:text="Fingerprint or Face Recognition"
-            android:layout_height="250px"
-            android:layout_width="750px"
-            android:textSize="50px"
-            android:fontFamily="@font/app_nunitobold"
-            android:backgroundTint="#fba127"
-            android:id="@+id/loginBioType"
-            app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.559"/>
+        android:id="@+id/loginBioType"
+        android:layout_width="750px"
+        android:layout_height="250px"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="#fba127"
+        android:fontFamily="@font/app_nunitobold"
+        android:text="Fingerprint or Face Recognition"
+        android:textSize="50px"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/setupPasswordContinue" />
+
     <Button
-            android:text="Password"
-            android:layout_height="250px"
-            android:layout_width="750px"
-            android:textSize="50px"
-            android:fontFamily="@font/app_nunitobold"
-            android:backgroundTint="#a294bc"
-            android:id="@+id/setupPasswordContinue"
-            app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toTopOf="@+id/loginBioType"
-            app:layout_constraintVertical_bias="0.974"/>
+        android:id="@+id/setupPasswordContinue"
+        android:layout_width="750px"
+        android:layout_height="250px"
+        android:layout_marginTop="15dp"
+        android:backgroundTint="#a294bc"
+        android:fontFamily="@font/app_nunitobold"
+        android:text="Password"
+        android:textSize="50px"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView3" />
+
     <TextView
-            android:text="Choose your login type:"
-            android:textColor="#FFFF"
-            android:textSize="85px"
-            android:fontFamily="@font/app_nunitobold"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:id="@+id/textView3"
-            app:layout_constraintBottom_toTopOf="@+id/setupPasswordContinue"
-            app:layout_constraintTop_toTopOf="parent" app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" app:layout_constraintHorizontal_bias="0.497"
-            app:layout_constraintVertical_bias="0.95"/>
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="280dp"
+        android:fontFamily="@font/app_nunitobold"
+        android:text="Choose your login type:"
+        android:textColor="#FFFF"
+        android:textSize="85px"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
-            android:text="You will be asked to login by this method everytime you enter the app"
-            android:textColor="#7c6474"
-            android:textSize="30px"
-            android:gravity="center"
-            android:fontFamily="@font/app_nunitobold"
-            android:layout_width="600px"
-            android:layout_height="wrap_content" android:id="@+id/textView4"
-            app:layout_constraintTop_toBottomOf="@+id/loginBioType" app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.497" app:layout_constraintVertical_bias="0.868"/>
+        android:id="@+id/textView4"
+        android:layout_width="600px"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="40dp"
+        android:fontFamily="@font/app_nunitobold"
+        android:gravity="center"
+        android:text="You will be asked to login by this method everytime you enter the app"
+        android:textColor="#7c6474"
+        android:textSize="30px"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <ImageView
         android:id="@+id/backButton"

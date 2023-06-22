@@ -29,6 +29,7 @@ public class PasswordList extends ArrayList<Password> {
                         ContentValues cv = new ContentValues();
                         cv.put("id", password.getId());
                         cv.put("email", password.getEmail());
+                        cv.put("extra", password.getExtra());
                         cv.put("password", User.encryptData(password.getPassword()));
                         cv.put("icon", password.getIcon());
                         cv.put("auto_generate", password.isAuto_generate());
@@ -69,10 +70,11 @@ public class PasswordList extends ArrayList<Password> {
                     id = cursor.getInt(0);
                     String email = cursor.getString(1);
                     String password = cursor.getString(2);
-                    byte[] icon = cursor.getBlob(3);
-                    int auto_generate = cursor.getInt(4);
+                    String extra = cursor.getString(3);
+                    byte[] icon = cursor.getBlob(4);
+                    int auto_generate = cursor.getInt(5);
 
-                    this.add(new Password(id, email, User.decryptData(password), icon, auto_generate));
+                    this.add(new Password(id, email, User.decryptData(password), icon, extra, auto_generate));
 
                 }catch (Exception exception){
                     //in case of an exception, toast and a debug messages are sent, and it continues to next password
@@ -141,7 +143,7 @@ public class PasswordList extends ArrayList<Password> {
                     String statement = "DROP TABLE " + PASSWORDS_TABLE;
                     database.execSQL(statement);
 
-                    statement = "CREATE TABLE " + PASSWORDS_TABLE + "(id int, email varchar(255), password varchar(255), icon blob, auto_generate number(1))";
+                    statement = "CREATE TABLE " + PASSWORDS_TABLE + "(id int, email varchar(255), password varchar(255), extra varchar(255), icon blob, auto_generate number(1))";
                     database.execSQL(statement);
 
                     Log.d("DEBUG","REMOVED ALL PASSWORDS SUCCESSFULLY! (database)");
@@ -163,6 +165,7 @@ public class PasswordList extends ArrayList<Password> {
                 if (currentPassword.getId() == id) {
                     currentPassword.setId(password.getId());
                     currentPassword.setEmail(password.getEmail());
+                    currentPassword.setExtra(password.getExtra());
                     currentPassword.setPassword(password.getPassword());
                     currentPassword.setIcon(password.getIcon());
                     currentPassword.setAuto_generate(password.isAuto_generate());
@@ -181,6 +184,7 @@ public class PasswordList extends ArrayList<Password> {
                         cv.put("id", password.getId());
                         cv.put("email", password.getEmail());
                         cv.put("password", User.encryptData(password.getPassword()));
+                        cv.put("extra", password.getExtra());
                         cv.put("icon", password.getIcon());
                         cv.put("auto_generate", password.isAuto_generate());
 
