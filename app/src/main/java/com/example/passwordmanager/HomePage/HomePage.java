@@ -23,9 +23,11 @@ import android.widget.Toast;
 
 import com.example.passwordmanager.AboutPage.About;
 import com.example.passwordmanager.AddPasswordPage.PasswordManagerPage;
+import com.example.passwordmanager.Config.Error;
 import com.example.passwordmanager.Config.OnSwipeTouchListener;
 import com.example.passwordmanager.Config.RunningActivities;
 import com.example.passwordmanager.Config.ToastMessage;
+import com.example.passwordmanager.Config.Troubleshooter;
 import com.example.passwordmanager.Password.Password;
 import com.example.passwordmanager.R;
 import com.example.passwordmanager.SettingsPage.SettingsPage;

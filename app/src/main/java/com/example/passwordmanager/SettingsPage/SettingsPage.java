@@ -21,6 +21,7 @@ import com.example.passwordmanager.LoadingScreen.LoadingScreen;
 import com.example.passwordmanager.LoginPage.SetupLoginPage;
 import com.example.passwordmanager.LoginPage.SetupPasswordPage;
 import com.example.passwordmanager.R;
+import com.example.passwordmanager.Troubleshooter.TroubleshooterPage;
 import com.example.passwordmanager.User.User;
 
 public class SettingsPage extends AppCompatActivity {
@@ -105,6 +106,8 @@ public class SettingsPage extends AppCompatActivity {
                     runTroubleshooter.animate().setDuration(500).translationX(-10);
                 }
             });
+
+            startActivity(new Intent(SettingsPage.this, TroubleshooterPage.class));
         });
 
         downloadPasswords.setOnClickListener(view -> {
