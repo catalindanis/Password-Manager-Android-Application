@@ -21,13 +21,11 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.passwordmanager.AboutPage.About;
-import com.example.passwordmanager.AddPasswordPage.PasswordManagerPage;
-import com.example.passwordmanager.Config.Error;
+import com.example.passwordmanager.AboutPage.AboutPage;
+import com.example.passwordmanager.PasswordManagerPage.PasswordManagerPage;
 import com.example.passwordmanager.Config.OnSwipeTouchListener;
 import com.example.passwordmanager.Config.RunningActivities;
 import com.example.passwordmanager.Config.ToastMessage;
-import com.example.passwordmanager.Config.Troubleshooter;
 import com.example.passwordmanager.Password.Password;
 import com.example.passwordmanager.R;
 import com.example.passwordmanager.SettingsPage.SettingsPage;
@@ -66,9 +64,7 @@ public class HomePage extends AppCompatActivity {
     }
 
     private void setupListeners() {
-
         scrollView.setOnTouchListener(new OnSwipeTouchListener(this){
-            int click = 0;
             @Override
             public void onSwipeRight() {
                 openMenu();
@@ -81,7 +77,7 @@ public class HomePage extends AppCompatActivity {
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if(click <= 1 && event.getX() >= menuLayout.getX()+menuLayout.getWidth())
+                if(event.getX() >= menuLayout.getX()+menuLayout.getWidth())
                     closeMenu();
                 return super.onTouch(v, event);
             }
@@ -105,13 +101,21 @@ public class HomePage extends AppCompatActivity {
 
         about.setOnClickListener((view) -> {
             closeMenu();
-            startActivity(new Intent(HomePage.this, About.class));
+            startActivity(new Intent(HomePage.this, AboutPage.class));
             overridePendingTransition(R.anim.slide_from_right,R.anim.slide_to_left);
+        });
+
+        findViewById(R.id.topMenu).setOnTouchListener(new OnSwipeTouchListener(this){
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getX() >= menuLayout.getX()+menuLayout.getWidth())
+                    closeMenu();
+                return super.onTouch(v, event);
+            }
         });
     }
 
     private void initializeValues() {
-        screen = (ConstraintLayout) findViewById(R.id.ConstraintLayout);
         menuLayout = (ConstraintLayout) findViewById(R.id.MenuLayout);
         passwordListLayout = (LinearLayout) findViewById(R.id.PasswordListLayout);
         scrollView = (ScrollView) findViewById(R.id.ScrollView);
@@ -146,32 +150,68 @@ public class HomePage extends AppCompatActivity {
 
                 passwordListLayout.addView(passwordLayout);
 
+                editButton.setOnTouchListener(new OnSwipeTouchListener(this){
+                    @Override
+                    public void onSwipeRight() {
+                        openMenu();
+                    }
+
+                    @Override
+                    public void onSwipeLeft() {
+                        closeMenu();
+                    }
+                });
+
                 editButton.setOnClickListener((view) -> {
-                    Intent intent = new Intent(this, PasswordManagerPage.class);
-                    intent.putExtra("edit", true);
-                    intent.putExtra("id", currentPassword.getId());
-                    intent.putExtra("email", currentPassword.getEmail());
-                    intent.putExtra("password", currentPassword.getPassword());
-                    intent.putExtra("extra", currentPassword.getExtra());
-                    intent.putExtra("icon", currentPassword.getIcon());
-                    intent.putExtra("auto_generate", currentPassword.isAuto_generate());
                     closeMenu();
-                    startActivity(intent);
-                    overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
+                    if(menuLayout.getVisibility() == View.INVISIBLE) {
+                        Intent intent = new Intent(this, PasswordManagerPage.class);
+                        intent.putExtra("edit", true);
+                        intent.putExtra("id", currentPassword.getId());
+                        intent.putExtra("email", currentPassword.getEmail());
+                        intent.putExtra("password", currentPassword.getPassword());
+                        intent.putExtra("extra", currentPassword.getExtra());
+                        intent.putExtra("icon", currentPassword.getIcon());
+                        intent.putExtra("auto_generate", currentPassword.isAuto_generate());
+                        closeMenu();
+                        startActivity(intent);
+                        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
+                    }
+                });
+
+                passwordLayout.setOnTouchListener(new OnSwipeTouchListener(this){
+                    @Override
+                    public void onSwipeRight() {
+                        openMenu();
+                    }
+
+                    @Override
+                    public void onSwipeLeft() {
+                        closeMenu();
+                    }
+
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        if(event.getX() >= menuLayout.getX()+menuLayout.getWidth())
+                            closeMenu();
+                        return super.onTouch(v, event);
+                    }
                 });
 
                 passwordLayout.setOnClickListener(view -> {
-                    Intent intent = new Intent(this, PasswordManagerPage.class);
-                    intent.putExtra("view", true);
-                    intent.putExtra("id", currentPassword.getId());
-                    intent.putExtra("email", currentPassword.getEmail());
-                    intent.putExtra("password", currentPassword.getPassword());
-                    intent.putExtra("extra", currentPassword.getExtra());
-                    intent.putExtra("icon", currentPassword.getIcon());
-                    intent.putExtra("auto_generate", currentPassword.isAuto_generate());
-                    closeMenu();
-                    startActivity(intent);
-                    overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
+                    if(menuLayout.getVisibility() == View.INVISIBLE) {
+                        Intent intent = new Intent(this, PasswordManagerPage.class);
+                        intent.putExtra("view", true);
+                        intent.putExtra("id", currentPassword.getId());
+                        intent.putExtra("email", currentPassword.getEmail());
+                        intent.putExtra("password", currentPassword.getPassword());
+                        intent.putExtra("extra", currentPassword.getExtra());
+                        intent.putExtra("icon", currentPassword.getIcon());
+                        intent.putExtra("auto_generate", currentPassword.isAuto_generate());
+                        closeMenu();
+                        startActivity(intent);
+                        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
+                    }
                 });
             }catch (Exception exception){
                 //in case of an exception, toast and a debug messages are sent

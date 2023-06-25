@@ -7,7 +7,7 @@ public class ToastMessage {
 
 
     public static final String SETUP_LOGIN_TYPE_ERROR = "Can't set your login type!";
-    public static final String GET_LOGIN_TYPE_ERROR = "Can't set your login type!";
+    public static final String GET_LOGIN_TYPE_ERROR = "Can't get your login type!";
     public static final String REMOVE_LOGIN_TYPE_ERROR = "Can't remove current login type!";
 
 
@@ -29,4 +29,6 @@ public class ToastMessage {
     public static final String CANT_UPDATE_PASSWORD = "Can't update your password!";
     public static final String CANT_ADD_PASSWORD = "Something went wrong with adding your password!";
     public static final String CANT_LOAD_PASSWORD = "Something went wrong with loading your password!";
+
+    public static final String CANT_DOWNLOAD_DATA = "Something went wrong with saving your passwords!";
 }

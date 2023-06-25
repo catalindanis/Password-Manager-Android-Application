@@ -43,9 +43,9 @@ public class LoadingScreen extends AppCompatActivity{
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        while(!APP_READY);
+                        while (!APP_READY) ;
                         startActivity(new Intent(LoadingScreen.this, cls));
-                        overridePendingTransition(R.anim.zoom_in,R.anim.static_animation);
+                        overridePendingTransition(R.anim.zoom_in, R.anim.static_animation);
                     }
                 }).start();
             }
@@ -60,7 +60,6 @@ public class LoadingScreen extends AppCompatActivity{
                 User.init(getApplicationContext());
             }
         }).start();
-
 
         findViewById(R.id.textView).setVisibility(View.VISIBLE);
         findViewById(R.id.textView).animate().setDuration(1500).alpha(0f).setListener(new AnimatorListenerAdapter() {

@@ -25,11 +25,11 @@
             android:exported="false"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".AboutPage.About"
+            android:name=".AboutPage.AboutPage"
             android:exported="false"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".AddPasswordPage.PasswordManagerPage"
+            android:name=".PasswordManagerPage.PasswordManagerPage"
             android:exported="false"
             android:screenOrientation="portrait"/>
         <activity

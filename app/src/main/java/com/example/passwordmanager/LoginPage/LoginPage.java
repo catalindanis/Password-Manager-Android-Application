@@ -28,11 +28,14 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.passwordmanager.Config.Error;
 import com.example.passwordmanager.Config.LoginType;
 import com.example.passwordmanager.Config.RunningActivities;
 import com.example.passwordmanager.Config.ToastMessage;
+import com.example.passwordmanager.Config.Troubleshooter;
 import com.example.passwordmanager.HomePage.HomePage;
 import com.example.passwordmanager.R;
+import com.example.passwordmanager.Troubleshooter.TroubleshooterPage;
 import com.example.passwordmanager.User.User;
 
 import org.jetbrains.annotations.NotNull;
@@ -127,6 +130,12 @@ public class LoginPage extends AppCompatActivity {
             }
             else{
                 Toast.makeText(this,ToastMessage.CANT_USE_BIOMETRICS,Toast.LENGTH_SHORT).show();
+                Troubleshooter.errors.add(new Error(
+                        String.format("Can't use biometrics authentication!"), "Tip: Maybe biometric" +
+                        "authentication is being used by another running app or permissions are restricted. Check " +
+                        "currently running apps, given permissions and try restarting the app, phone or reinstalling the app."
+                ));
+                startActivity(new Intent(LoginPage.this, TroubleshooterPage.class));
             }
         });
     }

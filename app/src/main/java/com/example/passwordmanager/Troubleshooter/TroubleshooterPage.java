@@ -2,18 +2,13 @@ package com.example.passwordmanager.Troubleshooter;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.passwordmanager.AddPasswordPage.PasswordManagerPage;
 import com.example.passwordmanager.Config.Error;
 import com.example.passwordmanager.Config.ToastMessage;
 import com.example.passwordmanager.Config.Troubleshooter;

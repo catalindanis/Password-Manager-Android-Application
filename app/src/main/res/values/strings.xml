@@ -4,18 +4,30 @@
     <string-array name="iconList_beforeClick">
         <item>Change icon</item>
         <item>Auto</item>
-        <item>Google</item>
         <item>Gmail</item>
         <item>Steam</item>
         <item>Instagram</item>
         <item>Facebook</item>
+        <item>Messenger</item>
+        <item>Whatsapp</item>
+        <item>Youtube</item>
+        <item>TikTok</item>
+        <item>Reddit</item>
+        <item>Google</item>
         <item>Discord</item>
         <item>Paypal</item>
         <item>Snapchat</item>
         <item>Github</item>
+        <item>Pinterest</item>
+        <item>Twitter</item>
+        <item>LinkedIn</item>
+        <item>Telegram</item>
+        <item>Skype</item>
         <item>Bybit</item>
         <item>Binance</item>
+        <item>TradingView</item>
         <item>Maxbounty</item>
+        <item>Twitch</item>
         <item>Epic Games</item>
         <item>EA Desktop</item>
         <item>Xbox</item>
@@ -23,18 +35,30 @@
 
     <string-array name="iconList_afterClick">
         <item>Auto</item>
-        <item>Google</item>
         <item>Gmail</item>
-        <item>Steam</item>
         <item>Instagram</item>
         <item>Facebook</item>
+        <item>Messenger</item>
+        <item>Whatsapp</item>
+        <item>Youtube</item>
+        <item>TikTok</item>
+        <item>Snapchat</item>
+        <item>Steam</item>
+        <item>Reddit</item>
+        <item>Google</item>
         <item>Discord</item>
         <item>Paypal</item>
-        <item>Snapchat</item>
         <item>Github</item>
+        <item>Pinterest</item>
+        <item>Twitter</item>
+        <item>LinkedIn</item>
+        <item>Telegram</item>
+        <item>Skype</item>
         <item>Bybit</item>
         <item>Binance</item>
+        <item>TradingView</item>
         <item>Maxbounty</item>
+        <item>Twitch</item>
         <item>Epic Games</item>
         <item>EA Desktop</item>
         <item>Xbox</item>

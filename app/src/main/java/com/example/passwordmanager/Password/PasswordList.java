@@ -2,6 +2,7 @@ package com.example.passwordmanager.Password;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
@@ -10,6 +11,7 @@ import android.widget.Toast;
 import com.example.passwordmanager.Config.Error;
 import com.example.passwordmanager.Config.ToastMessage;
 import com.example.passwordmanager.Config.Troubleshooter;
+import com.example.passwordmanager.Troubleshooter.TroubleshooterPage;
 import com.example.passwordmanager.User.User;
 
 import java.util.ArrayList;
@@ -44,6 +46,13 @@ public class PasswordList extends ArrayList<Password> {
                         Toast.makeText(context, ToastMessage.CANT_ADD_PASSWORD, Toast.LENGTH_LONG).show();
                         Log.d("DEBUG", "ADD PASSWORD ID=" + password.getId() + " LEAD TO ERROR!");
                         Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
+                        Troubleshooter.errors.add(new Error(
+                                String.format("Can't add password with email = %s! (in database)",password.getEmail()), "Tip: The data from your password might contain " +
+                                "corrupted data (illegal characters, icons can't be formatted, etc) or the passwords database is corrupted. Try revision your data from password" +
+                                ",restarting the app, removing all passwords " +
+                                "(from settings, not manually) and if it doesn't work try reinstalling the app."
+                        ));
+                        context.startActivity(new Intent(context, TroubleshooterPage.class));
                     }
                 }
 
@@ -54,6 +63,13 @@ public class PasswordList extends ArrayList<Password> {
             Toast.makeText(context, ToastMessage.CANT_ADD_PASSWORD, Toast.LENGTH_LONG).show();
             Log.d("DEBUG", "ADD PASSWORD ID=" + password.getId() + " LEAD TO ERROR!");
             Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
+            Troubleshooter.errors.add(new Error(
+                    String.format("Can't add password with email = %s! (in memory list)",password.getEmail()), "Tip: The data from your password might contain " +
+                    "corrupted data (illegal characters, icons can't be formatted, etc) or the passwords list is corrupted. Try revision your data from password" +
+                    ",restarting the app, removing all passwords " +
+                    "(from settings, not manually if possible) and if it doesn't work try reinstalling the app."
+            ));
+            context.startActivity(new Intent(context, TroubleshooterPage.class));
         }
     }
 
@@ -68,21 +84,28 @@ public class PasswordList extends ArrayList<Password> {
 
             while(cursor.moveToNext()) {
                 int id = -1;
+                String email = "null";
                 try {
                     id = cursor.getInt(0);
-                    String email = cursor.getString(1);
+                    email = cursor.getString(1);
                     String password = cursor.getString(2);
                     String extra = cursor.getString(3);
                     byte[] icon = cursor.getBlob(4);
                     int auto_generate = cursor.getInt(5);
 
                     this.add(new Password(id, email, User.decryptData(password), icon, extra, auto_generate));
-
                 }catch (Exception exception){
                     //in case of an exception, toast and a debug messages are sent, and it continues to next password
                     Toast.makeText(context, ToastMessage.CANT_GET_PASSWORD, Toast.LENGTH_LONG).show();
                     Log.d("DEBUG","GET PASSWORD ID=" + id + " LEAD TO ERROR!");
                     Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
+                    Troubleshooter.errors.add(new Error(
+                            String.format(String.format("Can't get password with email = %s!",email)), "Tip: If email = \"null\"," +
+                            "it doesn't mean that email is null, but error occurred before getting email from database, which might be corrupted. Try " +
+                            "restarting the app, removing all passwords (from settings, not manually if possible) " +
+                            "and if it doesn't work try reinstalling the app."
+                    ));
+                    context.startActivity(new Intent(context, TroubleshooterPage.class));
                 }
             }
 
@@ -95,14 +118,23 @@ public class PasswordList extends ArrayList<Password> {
             Toast.makeText(context, ToastMessage.CORRUPTED_TABLE_PASSWORDS, Toast.LENGTH_LONG).show();
             Log.d("DEBUG","GET USER PASSWORDS LEAD TO ERROR!");
             Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
+            Troubleshooter.errors.add(new Error(
+                    String.format(String.format("Can't get none of your passwords!")), "Tip: " +
+                    "database might be corrupted. Try " +
+                    "restarting the app, removing all passwords (from settings, not manually if possible) " +
+                    "and if it doesn't work try reinstalling the app."
+            ));
+            context.startActivity(new Intent(context, TroubleshooterPage.class));
         }
     }
 
     public void remove(int id, Context context){
+        String email = "null";
         try {
             //removing password from memory list
             for (Password password : this) {
                 if (password.getId() == id) {
+                    email = password.getEmail();
                     this.remove(password);
                     Log.d("DEBUG","PASSWORD ID=" + id + " REMOVED SUCCESSFULLY! (memory list)");
                     break;
@@ -126,6 +158,13 @@ public class PasswordList extends ArrayList<Password> {
             Toast.makeText(context, ToastMessage.CANT_REMOVE_PASSWORD, Toast.LENGTH_LONG).show();
             Log.d("DEBUG","REMOVE PASSWORD ID=" + id + " LEAD TO ERROR!");
             Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
+            Troubleshooter.errors.add(new Error(
+                    String.format(String.format("Can't remove password with email = %s!",email)), "Tip: If email = \"null\"," +
+                    "it doesn't mean that email is null, but password might not be found or an error occurred before finding the password. Try " +
+                    "restarting the app, removing all passwords (from settings, not manually if possible) " +
+                    "and if it doesn't work try reinstalling the app."
+            ));
+            context.startActivity(new Intent(context, TroubleshooterPage.class));
         }
     }
 
@@ -157,6 +196,12 @@ public class PasswordList extends ArrayList<Password> {
             Toast.makeText(context, ToastMessage.CANT_REMOVE_ALL_PASSWORDS, Toast.LENGTH_LONG).show();
             Log.d("DEBUG","REMOVE ALL PASSWORDS LEAD TO ERROR!");
             Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
+            Troubleshooter.errors.add(new Error(
+                    String.format(String.format("Can't get none of your passwords!")), "Tip: " +
+                    "Memory list or database might be corrupted. Try " +
+                    "restarting the app and if it doesn't work try reinstalling the app."
+            ));
+            context.startActivity(new Intent(context, TroubleshooterPage.class));
         }
     }
 
@@ -178,7 +223,6 @@ public class PasswordList extends ArrayList<Password> {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    try {
                         Passwords_Database db = new Passwords_Database(context);
                         SQLiteDatabase database = db.getWritableDatabase();
 
@@ -191,12 +235,6 @@ public class PasswordList extends ArrayList<Password> {
                         cv.put("auto_generate", password.isAuto_generate());
 
                         database.update(PASSWORDS_TABLE, cv, "id = ?", new String[]{Integer.toString(id)});
-                    }catch (Exception exception){
-                        //in case of an exception, toast and a debug messages are sent
-                        Toast.makeText(context, ToastMessage.CANT_UPDATE_PASSWORD, Toast.LENGTH_LONG).show();
-                        Log.d("DEBUG","UPDATING PASSWORD ID=" + id + " LEAD TO ERROR!");
-                        Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
-                    }
                 }
             }).start();
         } catch (Exception exception) {
@@ -204,6 +242,13 @@ public class PasswordList extends ArrayList<Password> {
             Toast.makeText(context, ToastMessage.CANT_UPDATE_PASSWORD, Toast.LENGTH_LONG).show();
             Log.d("DEBUG","UPDATING PASSWORD ID=" + id + " LEAD TO ERROR!");
             Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
+            Troubleshooter.errors.add(new Error(
+                    String.format(String.format("Can't update password with email = %s!",password.getEmail())), "Tip: " +
+                    "Memory list or database might be corrupted. Try " +
+                    "restarting the app, removing all passwords (from settings, not manually if possible) " +
+                    "and if it doesn't work try reinstalling the app."
+            ));
+            context.startActivity(new Intent(context, TroubleshooterPage.class));
         }
     }
 }

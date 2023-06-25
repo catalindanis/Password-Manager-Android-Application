@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/app_dark_blue"
+    tools:context=".AboutPage.AboutPage">
+
+    <ImageView
+        android:id="@+id/imageView9"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginStart="10dp"
+        android:src="@drawable/icon_no_background"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="22dp"
+        android:fontFamily="@font/app_nunitobold"
+        android:text="PASSWORD MANAGER"
+        android:textColor="@color/app_gray"
+        android:textSize="25dp"
+        app:layout_constraintStart_toEndOf="@+id/imageView9"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView10"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="22dp"
+        android:layout_marginEnd="10dp"
+        android:fontFamily="@font/app_nunitoregular"
+        android:justificationMode="inter_word"
+        android:text="Security is one of the most important things in our days.
+Having a very strong password for every account is a must-have, if you want to
+protect your data against attacks. This app was designed to solve one of the most
+common problem when it comes about passwords : FORGETTING. By storing your passwords
+and accessing them with a simple click, you can really forget about them. For keeping
+security level as high as possible, app doesn't communicate with an online database
+(which can be vulnerable) and it uses complex encryption algorithms.
+Besides that, being built in Java, the app is low memory consumption, using
+multithreading or concepts that speed up the processes of the app.
+"
+        android:textColor="@color/app_light_blue"
+        android:textSize="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView9" />
+
+    <TextView
+        android:id="@+id/textView11"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="22dp"
+        android:layout_marginEnd="10dp"
+        android:fontFamily="@font/app_nunitoregular"
+        android:justificationMode="inter_word"
+        android:text="App made entirely by Catalin Danis\nContact: geaigelsaflu@gmail.com\nMy activity: github.com/catalindanis"
+        android:textColor="@color/app_yellow"
+        android:textSize="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView10" />
+
+    <TextView
+        android:id="@+id/textView12"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="22dp"
+        android:layout_marginEnd="10dp"
+        android:fontFamily="@font/app_nunitoregular"
+
+        android:textColor="@color/white"
+        android:text="I do not own any copyright for icons, images or videos. All credits are reserved to : Vecteezy.com, Flaticon, Smashicons, Pixel Perfect, Freepik, amoghdesign.
+Please contact me if you find your work in the application and I didn't credited you."
+        android:textSize="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView11" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

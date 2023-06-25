@@ -3,6 +3,7 @@ package com.example.passwordmanager.User;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -14,12 +15,15 @@ import android.widget.Toast;
 
 import androidx.documentfile.provider.DocumentFile;
 
+import com.example.passwordmanager.Config.Error;
 import com.example.passwordmanager.Config.ToastMessage;
 import com.example.passwordmanager.Config.LoginType;
+import com.example.passwordmanager.Config.Troubleshooter;
 import com.example.passwordmanager.LoadingScreen.LoadingScreen;
 import com.example.passwordmanager.Password.Password;
 import com.example.passwordmanager.Password.PasswordList;
 import com.example.passwordmanager.R;
+import com.example.passwordmanager.Troubleshooter.TroubleshooterPage;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -174,6 +178,11 @@ public class User {
             Toast.makeText(context, ToastMessage.GET_LOGIN_TYPE_ERROR, Toast.LENGTH_LONG).show();
             Log.d("DEBUG", "GET USER LOGIN TYPE LEAD TO ERROR!");
             Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
+            Troubleshooter.errors.add(new Error(
+                    String.format("Can't get login type! (from database)"), "Tip: Database might be corrupted. " +
+                    "Try changing the login type, restarting or reinstalling the app."
+            ));
+            context.startActivity(new Intent(context, TroubleshooterPage.class));
             return LoginType.NULL;
         }
     }
@@ -197,6 +206,11 @@ public class User {
             Toast.makeText(context, ToastMessage.REMOVE_LOGIN_TYPE_ERROR, Toast.LENGTH_LONG).show();
             Log.d("DEBUG", "REMOVE USER LOGIN TYPE LEAD TO ERROR!");
             Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
+            Troubleshooter.errors.add(new Error(
+                    String.format("Can't remove or change current login type! (from database)"), "Tip: Database might be corrupted. " +
+                    "Try restarting or reinstalling the app."
+            ));
+            context.startActivity(new Intent(context, TroubleshooterPage.class));
             return false;
         }
     }
@@ -220,6 +234,11 @@ public class User {
             Toast.makeText(context, ToastMessage.REMOVE_LOGIN_PASSWORD_ERROR, Toast.LENGTH_LONG).show();
             Log.d("DEBUG", "REMOVE USER LOGIN PASSWORD LEAD TO ERROR!");
             Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
+            Troubleshooter.errors.add(new Error(
+                    String.format("Can't remove login password! (from database)"), "Tip: Database might be corrupted. " +
+                    "Try restarting or reinstalling the app."
+            ));
+            context.startActivity(new Intent(context, TroubleshooterPage.class));
             return false;
         }
     }
@@ -270,6 +289,11 @@ public class User {
             Toast.makeText(context, ToastMessage.GET_LOGIN_PASSWORD_ERROR, Toast.LENGTH_LONG).show();
             Log.d("DEBUG", "GET USER LOGIN PASSWORD LEAD TO ERROR!");
             Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
+            Troubleshooter.errors.add(new Error(
+                    String.format("Can't get login password! (from database)"), "Tip: Database might be corrupted. " +
+                    "Try restarting or reinstalling the app."
+            ));
+            context.startActivity(new Intent(context, TroubleshooterPage.class));
             loginPassword = null;
         }
     }
@@ -296,7 +320,16 @@ public class User {
             Toast.makeText(context, "SAVED : " + fileDirectory, Toast.LENGTH_LONG).show();
         }
         catch (Exception exception){
-            Log.d("DEBUG",exception.getMessage());
+            //in case of an exception, toast and a debug messages are sent
+            Toast.makeText(context, ToastMessage.CANT_DOWNLOAD_DATA, Toast.LENGTH_LONG).show();
+            Log.d("DEBUG", "DOWNLOAD USER DATA LEAD TO ERROR!");
+            Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
+            Troubleshooter.errors.add(new Error(
+                    String.format("Can't download your passwords! "), "Tip: Permission for writing " +
+                    "to a file on your device might be restricted. Check given permissions and  " +
+                    "try restarting or reinstalling the app."
+            ));
+            context.startActivity(new Intent(context, TroubleshooterPage.class));
         }
     }
 
@@ -305,34 +338,41 @@ public class User {
         User.removePasswords(context);
     }
 
-    public static String encryptData(String word) throws Exception{
-        byte[] ivBytes;
-        String password = "Hello";
-        /*you can give whatever you want for password. This is for testing purpose*/
-        SecureRandom random = new SecureRandom();
-        byte bytes[] = new byte[20];
-        random.nextBytes(bytes);
-        byte[] saltBytes = bytes;
-        // Derive the key
-        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-        PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), saltBytes, 65556, 256);
-        SecretKey secretKey = factory.generateSecret(spec);
-        SecretKeySpec secret = new SecretKeySpec(secretKey.getEncoded(), "AES");
-        //encrypting the word
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        cipher.init(Cipher.ENCRYPT_MODE, secret);
-        AlgorithmParameters params = cipher.getParameters();
-        ivBytes = params.getParameterSpec(IvParameterSpec.class).getIV();
-        byte[] encryptedTextBytes = cipher.doFinal(word.getBytes("UTF-8"));
-        //prepend salt and vi
-        byte[] buffer = new byte[saltBytes.length + ivBytes.length + encryptedTextBytes.length];
-        System.arraycopy(saltBytes, 0, buffer, 0, saltBytes.length);
-        System.arraycopy(ivBytes, 0, buffer, saltBytes.length, ivBytes.length);
-        System.arraycopy(encryptedTextBytes, 0, buffer, saltBytes.length + ivBytes.length, encryptedTextBytes.length);
-        return Base64.getEncoder().encodeToString(buffer);
+    public static String encryptData(String word){
+        try {
+            byte[] ivBytes;
+            String password = "Hello";
+            /*you can give whatever you want for password. This is for testing purpose*/
+            SecureRandom random = new SecureRandom();
+            byte bytes[] = new byte[20];
+            random.nextBytes(bytes);
+            byte[] saltBytes = bytes;
+            // Derive the key
+            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+            PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), saltBytes, 65556, 256);
+            SecretKey secretKey = factory.generateSecret(spec);
+            SecretKeySpec secret = new SecretKeySpec(secretKey.getEncoded(), "AES");
+            //encrypting the word
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            cipher.init(Cipher.ENCRYPT_MODE, secret);
+            AlgorithmParameters params = cipher.getParameters();
+            ivBytes = params.getParameterSpec(IvParameterSpec.class).getIV();
+            byte[] encryptedTextBytes = cipher.doFinal(word.getBytes("UTF-8"));
+            //prepend salt and vi
+            byte[] buffer = new byte[saltBytes.length + ivBytes.length + encryptedTextBytes.length];
+            System.arraycopy(saltBytes, 0, buffer, 0, saltBytes.length);
+            System.arraycopy(ivBytes, 0, buffer, saltBytes.length, ivBytes.length);
+            System.arraycopy(encryptedTextBytes, 0, buffer, saltBytes.length + ivBytes.length, encryptedTextBytes.length);
+            return Base64.getEncoder().encodeToString(buffer);
+        }catch (Exception exception){
+            //in case of an exception, debug messages are sent;
+            Log.d("DEBUG", "ENCRYPT USER DATA LEAD TO ERROR!");
+            Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
+            return null;
+        }
     }
 
-    public static String decryptData(String encryptedText) throws Exception{
+    public static String decryptData(String encryptedText){
         try {
             String password = "Hello";
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
@@ -362,6 +402,9 @@ public class User {
 
             return new String(decryptedTextBytes);
         }catch (Exception exception){
+            //in case of an exception, debug messages are sent;
+            Log.d("DEBUG", "DECRYPT USER DATA LEAD TO ERROR!");
+            Log.d("DEBUG", "ERROR MESSAGE: " + exception.getMessage());
             return null;
         }
     }
@@ -371,14 +414,14 @@ public class User {
         Resources resources = context.getResources();
         int id = -1;
         switch (preInstalledIcon) {
-            case "Google":
-                id = R.drawable.google;
-                break;
             case "Gmail":
                 id = R.drawable.gmail;
                 break;
+            case "Google":
+                id = R.drawable.google;
+                break;
             case "Steam":
-                id = R.drawable.steam;
+            id = R.drawable.steam;
                 break;
             case "Instagram":
                 id = R.drawable.instagram;
@@ -415,6 +458,42 @@ public class User {
                 break;
             case "Xbox":
                 id = R.drawable.xbox;
+                break;
+            case "Messenger":
+                id = R.drawable.messenger;
+                break;
+            case "Whatsapp":
+                id = R.drawable.whatsapp;
+                break;
+            case "Youtube":
+                id = R.drawable.youtube;
+                break;
+            case "TikTok":
+                id = R.drawable.tiktok;
+                break;
+            case "Reddit":
+                id = R.drawable.reddit;
+                break;
+            case "Pinterest":
+                id = R.drawable.pinterest;
+                break;
+            case "Twitter":
+                id = R.drawable.twitter;
+                break;
+            case "LinkedIn":
+                id = R.drawable.linkedin;
+                break;
+            case "Telegram":
+                id = R.drawable.telegram;
+                break;
+            case "Skype":
+                id = R.drawable.skype;
+                break;
+            case "Twitch":
+                id = R.drawable.twitch;
+                break;
+            case "TradingView":
+                id = R.drawable.tradingview;
                 break;
         }
 
